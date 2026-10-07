@@ -17,11 +17,58 @@ class FiltersScope implements Scope
             return;
         }
 
+        $allowedFilters  = $model->allowedFilters ?? [];
+
         $filters = request('filters');
 
         foreach ($filters as $field => $conditions) {
+
+            if (!in_array($field, $allowedFilters)) {
+                continue;
+            }
+
+
             foreach ($conditions as $operator => $value) {
-                if (in_array($operator,['=','>','<','>=','<=','!='])) {
+                if ($value === null || $value === '') {
+                    continue;
+                }
+                if (str_contains($field, '.')) {
+                    [$relation, $column] = explode('.', $field, 2);
+                    $builder->whereHas($relation, function ($query) use (
+                        $column,
+                        $operator,
+                        $value
+                    ) {
+
+                        if ($operator === 'like') {
+                            $query->where(
+                                $column,
+                                'like',
+                                "%{$value}%"
+                            );
+
+                            return;
+                        }
+
+                        if (in_array($operator, [
+                            '=',
+                            '>',
+                            '<',
+                            '>=',
+                            '<=',
+                            '!=',
+                        ])) {
+                            $query->where(
+                                $column,
+                                $operator,
+                                $value
+                            );
+                        }
+                    });
+
+                    continue;
+                }
+                if (in_array($operator, ['=', '>', '<', '>=', '<=', '!='])) {
                     $builder->where($field, $operator, $value);
                 }
 
@@ -30,7 +77,5 @@ class FiltersScope implements Scope
                 }
             }
         }
-
-
     }
 }

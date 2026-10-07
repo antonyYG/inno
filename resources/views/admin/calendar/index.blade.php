@@ -22,9 +22,6 @@
                         var calendarEl = this.$refs.calendar;
                         var calendar = new FullCalendar.Calendar(calendarEl, {
                             locale: 'es',
-
-
-
                             headerToolbar: {
                                 left: 'prev,next today',
                                 center: 'title',
@@ -34,6 +31,12 @@
 
                             slotMinTime: '07:00:00',
                             slotMaxTime: '19:00:00',
+                            events:{
+                                url:'{{ route('admin.calendar.data') }}',
+                                failure: function(){
+                                    alert('Hubo un error')
+                                }
+                            }
 
                         });
                         calendar.render();

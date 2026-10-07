@@ -29,9 +29,11 @@ class UserStoreRequest extends FormRequest
             'password' => 'required',
             'discord_id' => [
             Rule::requiredIf($this->rol === 'practicing'),
-            'nullable',
-            'unique:practicings,discord_id',
-        ],
+                'nullable',
+                'unique:practicings,discord_id'
+
+            ],
+            'area' => 'sometimes|required|exists:areas,id'
         ];
     }
 }

@@ -6,7 +6,7 @@
             Listado de Areas
 
             <x-slot name="actions">
-                <x-button @click.stop="open = true">
+                <x-button @click="open = true">
                     Nueva Area
                 </x-button>
             </x-slot>

@@ -3,18 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserStoreRequest;
+use App\Models\Area;
 use App\Models\User;
+use App\Services\UserService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+
+    public function __construct(
+        protected UserService $userService
+    ){}
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $users = User::filters()->GetOrPaginate();
-        // return $users;
+        $users = User::role('admin')->filters()->GetOrPaginate();
         return view('admin.users.index', compact('users'));
     }
 
@@ -23,7 +31,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.users.create');
+        $areas = Area::select('id','name')->get();
+        return view('admin.users.create',compact('areas'));
     }
 
     /**
@@ -32,20 +41,25 @@ class UserController extends Controller
     public function store(UserStoreRequest $request)
     {
         $data = $request->validated();
-        $user=User::create($data);
-        $user->assignRole($data['rol']);
-        if ($data['rol'] == 'practicing') {
-            $user->practicing()->create([
-                'discord_id' => $data['discord_id'],
+        try {
+            DB::beginTransaction();
+            $this->userService->store($data);
+            DB::commit();
+            session()->flash('swal',[
+                'message' => 'usuario Creado',
+                'title' => 'Exito',
+                'icon' => 'success'
+            ]);
+            return redirect()->route('admin.users.index');
+
+        } catch (Exception $e) {
+            DB::rollback();
+             session()->flash('swal',[
+                'message' => 'No se pudo crear al usuario',
+                'title' => 'Fallido',
+                'icon' => 'error'
             ]);
         }
-
-        session()->flash('swal',[
-            'message' => 'usuario Creado',
-            'title' => 'Exito'
-        ]);
-
-        return redirect()->route('admin.users.index');
 
     }
 

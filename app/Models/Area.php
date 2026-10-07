@@ -20,4 +20,7 @@ class Area extends Model
         return $query->paginate($perPage);
     }
 
+    public array $allowedFilters=['name'];
+
+
 }

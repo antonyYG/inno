@@ -64,4 +64,7 @@ class User extends Authenticatable
         return $this->HasOne(Practicing::class);
     }
 
+    public array $allowedFilters=['name'];
+
+
 }

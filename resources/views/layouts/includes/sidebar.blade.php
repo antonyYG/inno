@@ -20,6 +20,11 @@
             "route" => "admin.calendar.index",
             'isRoute' => request()->routeIs('admin.calendar.index')
         ],
+        [
+            "name" => "Practicantes",
+            "route" => "admin.practicings.index",
+            'isRoute' => request()->routeIs('admin.practicings.*')
+        ],
     ]
 @endphp
 
