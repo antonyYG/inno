@@ -15,15 +15,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $data['email'])->first();
-
-        if (!$user || !password_verify($data['password'], $user->password)) {
+        if (!Auth::attempt($data)) {
             return back()->withErrors([
-                'email' => 'El correo o la contraseña son incorrectos.',
-            ])->withInput();
+                'email' => 'Las credenciales no son validas',
+            ])->onlyInput('email');
         }
-
-        Auth::login($user);
 
         $request->session()->regenerate();
 

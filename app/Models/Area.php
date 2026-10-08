@@ -12,7 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 class Area extends Model
 {
     use HasFactory;
-    protected $fillable = ['name'];
+
+    protected $table = 'areas';
+
+    protected $fillable = ['nombre'];
 
     public function scopeGetOrPaginate($query,int $default=5)
     {
@@ -20,7 +23,7 @@ class Area extends Model
         return $query->paginate($perPage);
     }
 
-    public array $allowedFilters=['name'];
+    public array $allowedFilters=['nombre'];
 
 
 }

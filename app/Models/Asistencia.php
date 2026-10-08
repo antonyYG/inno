@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Falta extends Model
+class Attendance extends Model
 {
     protected $fillable = [
         'practicante_id',
         'fecha',
         'turno',
+        'hora_ingreso',
+        'hora_fin',
+        'tiempo_trabajado'
     ];
 
     public function practicante()

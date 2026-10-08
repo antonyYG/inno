@@ -29,17 +29,3 @@ Route::get('/calendar-data',function(){
         ];
     });
 })->name('calendar.data');
-
-// 'id' => $appointment->id,
-//                 'title' => $appointment->intern->user->name,
-//                 'start' => $appointment->check_in,
-//                 'end' => $appointment->last_join,
-//                 'color' => $appointment->shift == 'mañana'
-//                     ? '#f59e0b'
-//                     : '#3b82f6',
-
-//                 'extendedProps' => [
-//                     'shift' => $appointment->shift,
-//                     'status' => $appointment->status,
-//                     'worked_minutes' => $appointment->worked_minutes,
-//                 ],

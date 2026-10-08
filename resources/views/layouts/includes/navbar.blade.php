@@ -29,24 +29,21 @@
             <div class="z-50 hidden bg-white border border-gray-100 rounded-xl shadow-lg w-48" id="dropdown-user">
               <div class="px-4 py-3 border-b border-gray-100" role="none">
                 <p class="text-sm font-medium text-gray-900" role="none">
-                  Neil Sims
+                  {{ auth()->user()->name }}
                 </p>
                 <p class="text-sm text-gray-500 truncate" role="none">
-                  neil.sims@crudagency.com
+                  {{ auth()->user()->email }}
                 </p>
               </div>
               <ul class="p-2 text-sm font-medium text-gray-600" role="none">
                 <li>
-                  <a href="#" class="inline-flex items-center w-full p-2 hover:bg-[#f2c94c]/10 hover:text-[#020830] rounded-lg transition-colors" role="menuitem">Dashboard</a>
+                  <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center w-full p-2 hover:bg-[#f2c94c]/10 hover:text-[#020830] rounded-lg transition-colors" role="menuitem">Dashboard</a>
                 </li>
                 <li>
-                  <a href="#" class="inline-flex items-center w-full p-2 hover:bg-[#f2c94c]/10 hover:text-[#020830] rounded-lg transition-colors" role="menuitem">Settings</a>
-                </li>
-                <li>
-                  <a href="#" class="inline-flex items-center w-full p-2 hover:bg-[#f2c94c]/10 hover:text-[#020830] rounded-lg transition-colors" role="menuitem">Earnings</a>
-                </li>
-                <li>
-                  <a href="#" class="inline-flex items-center w-full p-2 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors" role="menuitem">Sign out</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center w-full p-2 hover:bg-[#f2c94c]/10 hover:text-[#020830] rounded-lg transition-colors" role="menuitem">Cerrar Sesion</button>
+                    </form>
                 </li>
               </ul>
             </div>

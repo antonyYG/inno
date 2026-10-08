@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('supervisors', function (Blueprint $table) {
+        Schema::create('faltas', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('last_name');
-            $table->string('phone')->unique();
-            $table->foreignId('area_id')->constrained()->onDelete('cascade');
+
+            $table->foreignId('practicante_id')->constrained('practicantes')->onDelete('cascade');
+            $table->date('fecha');
+            $table->enum('turno', ['mañana', 'tarde']);
+            
+
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('supervisors');
+        Schema::dropIfExists('faltas');
     }
 };

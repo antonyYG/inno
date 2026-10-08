@@ -10,13 +10,15 @@ use Illuminate\Database\Eloquent\Model;
     FiltersScope::class
 ])]
 
-class Practicing extends Model
+class Practicante extends Model
 {
     protected $fillable = [
         'user_id',
         'discord_id',
         'area_id',
-        'status',
+        'estado',
+        'fecha_inicio',
+        'fecha_fin'
     ];
 
     public function scopeGetOrPaginate($query,int $default =5)
@@ -27,7 +29,7 @@ class Practicing extends Model
 
     public function area()
     {
-        return $this->belongsTo(Area::class);
+        return $this->belongsTo(Area::class,'area_id');
     }
 
     public function user()
