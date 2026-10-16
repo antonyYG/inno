@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('justificaciones', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('falta_id')->constrained('faltas')->onDelete('cascade');
-            $table->text('descripcion');
-            $table->string('archivo_path');
+            $table->foreignId('asistencia_id')->constrained('asistencias')->onDelete('cascade');
+            $table->text('motivo');
+            $table->string('evidencia');
             $table->enum('estado', ['pendiente', 'aprobada', 'rechazada'])->default('pendiente');
-            
+            $table->date('fecha');
 
             $table->timestamps();
         });

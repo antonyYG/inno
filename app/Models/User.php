@@ -17,12 +17,14 @@ use Illuminate\Notifications\Notifiable;
 use Override;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['nombre', 'email', 'password','fecha_inicio','fecha_fin','estado','area_id','discord_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable,HasRoles;
+
+    protected $table = 'usuarios';
 
     /**
      * Get the attributes that should be cast.
@@ -55,16 +57,16 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'estado' => 'boolean'
         ];
     }
 
-
-    public function practicing()
-    {
-        return $this->HasOne(Practicing::class);
-    }
-
     public array $allowedFilters=['name'];
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
 
 
 }

@@ -20,8 +20,12 @@ class DatabaseSeeder extends Seeder
 
         Area::factory(20)->create();
         User::factory()->create([
-            'name' => 'pepe',
+            'nombre' => 'pepe',
             'email' => 'pepe@gmail.com',
+            'fecha_inicio' => '2026/10/16',
+            'fecha_fin' => '2026/12/16',
+            'estado' => true,
+            'area_id' => Area::value('id'),
             'password' => bcrypt('12345678'),
         ]);
 

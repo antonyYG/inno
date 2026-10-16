@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('faltas', function (Blueprint $table) {
+        Schema::create('asistencias', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('practicante_id')->constrained('practicantes')->onDelete('cascade');
+            $table->foreignId('usuario_id')->constrained('usuarios')->onDelete('cascade');
             $table->date('fecha');
-            $table->enum('turno', ['mañana', 'tarde']);
-            
-
+            $table->time('hora_inicio')->nullable();
+            $table->time('hora_fin')->nullable();
+            $table->time('tiempo_trabajado')->nullable();
+            $table->enum('tipo',['asistio','falto','tardanza']);
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('faltas');
+        Schema::dropIfExists('asistencias');
     }
 };

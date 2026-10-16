@@ -41,7 +41,7 @@
                        autocomplete="username"
                        inputmode="email"
                        placeholder="correo@ejemplo.com"
-                       required autofocus
+                        autofocus
                        @if ($errors->has('email')) aria-invalid="true" @endif
                        aria-describedby="email-error"
                        @class([
@@ -70,7 +70,6 @@
                        :type="show ? 'text' : 'password'"
                        autocomplete="current-password"
                        placeholder="••••••••"
-                       required
                        @if ($errors->has('password')) aria-invalid="true" @endif
                        aria-describedby="password-error"
                        @class([
