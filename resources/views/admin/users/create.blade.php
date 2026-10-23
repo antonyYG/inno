@@ -14,7 +14,7 @@
                     <label for="name" class="block mb-1 text-sm font-medium text-heading">
                         Nombre
                     </label>
-                    <x-input id="name" name="name" placeholder="Nombre" />
+                    <x-input id="name" name="nombre" placeholder="Nombre" />
                     <x-input-error for="name" />
                 </div>
 
@@ -48,13 +48,13 @@
                         <label for="area" class="block mb-1 text-sm font-medium text-heading">
                             Area
                         </label>
-                        <x-select name="area">
+                        <x-select name="area_id">
                             <option value="" disabled {{ old('area') ? '' : 'selected' }}>
                                 Selecciona un área
                             </option>
                             @foreach ($areas as $area)
                             <option value="{{ $area->id }}" {{ old('area') == $area->id ? 'selected' : '' }}>
-                                {{ $area->name }}
+                                {{ $area->nombre }}
                             </option>
                             @endforeach
                         </x-select>

@@ -2,28 +2,33 @@
     $links = [
         [
             "name" => "Dashboard",
+            "icon" => "fa-solid fa-gauge",
             "route" => "admin.dashboard",
             'isRoute' => request()->routeIs('admin.dashboard')
         ],
         [
             "name" => "Usuarios",
+            "icon" => "fa-solid fa-user-group",
             "route" => "admin.users.index",
             'isRoute' => request()->routeIs('admin.users.*')
         ],
         [
             "name" => "Areas",
+            "icon" => "fa-solid fa-layer-group",
             "route" => "admin.areas.index",
             'isRoute' => request()->routeIs('admin.areas.*')
         ],
         [
             "name" => "Calendario",
+            "icon" => "fa-solid fa-calendar",
             "route" => "admin.calendar.index",
             'isRoute' => request()->routeIs('admin.calendar.index')
         ],
         [
-            "name" => "Practicantes",
-            "route" => "admin.practicings.index",
-            'isRoute' => request()->routeIs('admin.practicings.*')
+            "name" => "Justificaciones",
+            "icon" => "fa-solid fa-calendar",
+            "route" => "admin.justifications.index",
+            'isRoute' => request()->routeIs('admin.justifications.*')
         ],
     ]
 @endphp
@@ -38,11 +43,7 @@
                     {{ $link['isRoute']
                         ? 'bg-[#f2c94c] text-[#020830] font-semibold'
                         : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                <svg class="w-5 h-5 transition duration-75 {{ $link['isRoute'] ? 'text-[#020830]' : 'text-slate-400 group-hover:text-white' }}"
-                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6.025A7.5 7.5 0 1 0 17.975 14H10V6.025Z"/>
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 3c-.169 0-.334.014-.5.025V11h7.975c.011-.166.025-.331.025-.5A7.5 7.5 0 0 0 13.5 3Z"/>
-                </svg>
+                <i class="{{ $link['icon'] }}" ></i>
                 <span class="ms-3 text-sm">{{ $link['name'] }}</span>
                 </a>
             </li>

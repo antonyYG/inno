@@ -23,17 +23,14 @@ class UserStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255',
             'rol' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:usuarios,email',
             'password' => 'required',
-            'discord_id' => [
-            Rule::requiredIf($this->rol === 'practicing'),
-                'nullable',
-                'unique:practicings,discord_id'
-
-            ],
-            'area' => 'sometimes|required|exists:areas,id'
+            'discord_id' =>'required|unique:usuarios,discord_id',
+            'area_id' => 'required|exists:areas,id',
+            'fecha_inicio' => 'nullable',
+            'fecha_fin' => 'nullable',
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Area;
 use Exception;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class AreaController extends Controller
 {
@@ -13,8 +14,17 @@ class AreaController extends Controller
      */
     public function index()
     {
-        $areas = Area::GetOrPaginate();
-        return view('admin.area.index',compact('areas'));
+        return view('admin.area.index');
+    }
+
+    public function data()
+    {
+        $query = Area::select(['id','nombre','created_at']);
+
+        return DataTables::eloquent($query)
+            ->addColumn('acciones',fn($area)=> view('admin.area.actions',compact('area'))->render())
+            ->rawColumns(['acciones'])
+            ->toJson();
     }
 
     /**
@@ -23,7 +33,7 @@ class AreaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|unique:areas,name',
+            'nombre' => 'required|unique:areas,nombre',
         ]);
 
         Area::create($data);
@@ -57,7 +67,14 @@ class AreaController extends Controller
      */
     public function update(Request $request, Area $area)
     {
-        //
+        $data=$request->validate([
+            'nombre' => 'required|unique:areas,nombre,'.$area->id
+        ]);
+
+        $area->update($data);
+
+        return redirect()->route('admin.areas.index');
+
     }
 
     /**
@@ -65,6 +82,24 @@ class AreaController extends Controller
      */
     public function destroy(Area $area)
     {
-        //
+        if ($area->users()->exists()) {
+            session()->flash('swal',[
+                'title' => 'No se peude elimianr!',
+                'message' => 'Usuarios asociados',
+                'icon' => 'error'
+            ]);
+            return redirect()->back();
+        }
+
+        $area->delete();
+
+        session()->flash('swal',[
+            'title' => 'Bien hecho!',
+            'message' => 'Area eliminada correctamente',
+            'icon' => 'success'
+        ]);
+
+        return redirect()->back();
+
     }
 }

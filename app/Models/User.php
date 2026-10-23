@@ -61,7 +61,7 @@ class User extends Authenticatable
         ];
     }
 
-    public array $allowedFilters=['name'];
+    public array $allowedFilters=['nombre'];
 
     public function area()
     {

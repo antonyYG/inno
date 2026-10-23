@@ -1,5 +1,7 @@
 <x-admin-layout>
-
+    @push('js')
+        @vite(['resources/css/app.css', 'resources/js/tableUser.js'])
+    @endpush
     <x-header>
         Listado de Usuarios
 
@@ -13,29 +15,23 @@
         </x-slot>
 
     </x-header>
-
-    <x-table
-        :columns="[
-            ['key' => 'id', 'label' => 'ID', 'sortable' => true],
-            ['key' => 'name', 'label' => 'Nombre', 'sortable' => true],
-            ['key' => 'email', 'label' => 'Email', 'sortable' => true],
-            ['key' => 'created_at', 'label' => 'Creado', 'sortable' => true],
-        ]"
-        :rows="$users"
-        :search-fields="[
-        ['key' => 'name', 'label' => 'Nombre'],
-        ['key' => 'description', 'label' => 'Descripción'],
-    ]"
-    >
-        @foreach ($users as $user)
+<select id="filter-rol">
+    <option value="">Todos los roles</option>
+    <option value="admin">Administrador</option>
+    <option value="practicing">Practicante</option>
+</select>
+    <table id="users-table" data-url="{{ route('admin.users.data') }}" class="w-full">
+        <thead>
             <tr>
-                <td class="px-4 py-3">{{ $user->id }}</td>
-                <td class="px-4 py-3">{{ $user->name }}</td>
-                <td class="px-4 py-3">{{ $user->email }}</td>
-                <td class="px-4 py-3">{{ $user->created_at->format('d/m/Y') }}</td>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acciones</th>
             </tr>
-        @endforeach
-    </x-table>
+        </thead>
+    </table>
+    
 
 
 </x-admin-layout>

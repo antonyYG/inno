@@ -85,16 +85,9 @@
                         aria-pressed="false"
                         class="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#020830] motion-reduce:transition-none">
                     {{-- Ojo (contraseña oculta) --}}
-                    <svg x-show="! show" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-5 w-5">
-                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
-                    </svg>
+                    <i x-show="! show" class="fa-regular fa-eye"></i>
                     {{-- Ojo tachado (contraseña visible) --}}
-                    <svg x-show="show" style="display: none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-5 w-5">
-                        <path d="M3 3l18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.5 7.6C3.6 9.4 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.2-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9.9 10a3 3 0 0 0 4.1 4.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
+                    <i x-show="show" class="fa-regular fa-eye-slash"></i>
                 </button>
             </div>
             <div id="password-error" aria-live="polite">
@@ -115,14 +108,5 @@
             <span x-show="loading" style="display: none">Ingresando…</span>
         </button>
     </form>
-
-    {{-- Ayuda --}}
-    <p class="mt-8 border-t border-slate-200 pt-6 text-center text-sm text-slate-600">
-        ¿Necesitas ayuda?
-        <a href="#"
-           class="rounded font-medium text-[#020830] underline decoration-[#f2c94c] decoration-2 underline-offset-4 transition-colors hover:decoration-[#020830] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#020830] focus-visible:ring-offset-2 motion-reduce:transition-none">
-            Contacta a soporte
-        </a>
-    </p>
 
 </x-auth-layout>

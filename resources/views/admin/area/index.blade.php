@@ -1,5 +1,7 @@
 <x-admin-layout>
-
+    @push('js')
+        @vite(['resources/css/app.css', 'resources/js/tableArea.js'])
+    @endpush
     <div x-data="{ open: false }">
 
         <x-header>
@@ -12,27 +14,16 @@
             </x-slot>
         </x-header>
 
-        <x-table
-         :columns="[
-            ['key' => 'id', 'label' => 'ID', 'sortable' => true],
-            ['key' => 'name', 'label' => 'Nombre', 'sortable' => true],
-            ['key' => 'created_at', 'label' => 'Creado', 'sortable' => true],
-         ]"
-         :rows="$areas"
-         :search-fields="[
-        ['key' => 'name', 'label' => 'Nombre'],
-        ]"
-        >
-
-        @foreach ($areas as $area)
-            <tr>
-                <td class="px-4 py-3">{{ $area->id }}</td>
-                <td class="px-4 py-3">{{ $area->name }}</td>
-                <td class="px-4 py-3">{{ $area->created_at->format('d/m/Y') }}</td>
-            </tr>
-        @endforeach
-
-        </x-table>
+       <table id="areas-table" data-url="{{ route('admin.areas.data') }}" class="w-full">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Fecha Creacion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+        </table>
 
 
         {{-- Modal --}}
@@ -41,7 +32,7 @@
             <form x-ref="form" action="{{ route('admin.areas.store') }}" method="POST">
                 @csrf
 
-                <x-input name="name" value="{{ old('name') }}" />
+                <x-input name="nombre" value="{{ old('nombre') }}" />
 
                 <x-input-error for="name" />
 

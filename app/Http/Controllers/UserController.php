@@ -7,23 +7,46 @@ use App\Models\Area;
 use App\Models\User;
 use App\Services\UserService;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
 
     public function __construct(
         protected UserService $userService
-    ){}
+    ) {}
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $users = User::role('admin')->filters()->GetOrPaginate();
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index');
+    }
+
+    public function data()
+    {
+        $query = User::with('roles')
+            ->select(['id', 'nombre', 'email']);
+
+        return DataTables::eloquent($query)
+            ->filter(function ($query) {
+                if (request()->filled('rol')) {
+                    $query->whereHas('roles', function (Builder $q) {
+                        $q->where('name', request('rol'));
+                    });
+                }
+            })
+            ->addColumn(
+                'acciones',
+                fn($user) =>
+                view('admin.users.actions', compact('user'))->render()
+            )
+            ->rawColumns(['acciones'])
+            ->toJson();
     }
 
     /**
@@ -31,8 +54,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        $areas = Area::select('id','name')->get();
-        return view('admin.users.create',compact('areas'));
+        $areas = Area::select('id', 'nombre')->get();
+        return view('admin.users.create', compact('areas'));
     }
 
     /**
@@ -43,24 +66,23 @@ class UserController extends Controller
         $data = $request->validated();
         try {
             DB::beginTransaction();
-            $this->userService->store($data);
+            $user = User::create($data);
+            $user->assignRole($data['rol']);
             DB::commit();
-            session()->flash('swal',[
+            session()->flash('swal', [
                 'message' => 'usuario Creado',
                 'title' => 'Exito',
                 'icon' => 'success'
             ]);
             return redirect()->route('admin.users.index');
-
         } catch (Exception $e) {
             DB::rollback();
-             session()->flash('swal',[
+            session()->flash('swal', [
                 'message' => 'No se pudo crear al usuario',
                 'title' => 'Fallido',
                 'icon' => 'error'
             ]);
         }
-
     }
 
     /**

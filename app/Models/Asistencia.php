@@ -2,22 +2,26 @@
 
 namespace App\Models;
 
+use App\Enum\EstadoAsistenciaEnum;
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class Asistencia extends Model
 {
     protected $fillable = [
-        'practicante_id',
+        'usuario_id',
         'fecha',
-        'turno',
-        'hora_ingreso',
+        'hora_inicio',
         'hora_fin',
-        'tiempo_trabajado'
+        'tipo'
     ];
 
-    public function practicante()
+    protected $casts = [
+        'tipo' => EstadoAsistenciaEnum::class
+    ];
+
+    public function usuario()
     {
-        return $this->belongsTo(Practicante::class,'practicante_id');
+        return $this->belongsTo(User::class,'usuario_id');
     }
 
 }

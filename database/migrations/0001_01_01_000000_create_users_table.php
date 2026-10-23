@@ -18,8 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('estado')->default(true);
-            $table->date('fecha_inicio');
-            $table->date('fecha_fin');
+            $table->date('fecha_inicio')->nullable();
+            $table->date('fecha_fin')->nullable();
             $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
             $table->string('discord_id')->unique()->nullable();
             $table->rememberToken();

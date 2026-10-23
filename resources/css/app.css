@@ -1,3 +1,4 @@
+@import "../../node_modules/datatables.net-dt/css/dataTables.dataTables.css";
 @import 'tailwindcss';
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
@@ -9,6 +10,230 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
 [x-cloak] {
     display: none !important;
+}
+
+table[data-url]:not(.dataTable) {
+    visibility: hidden;
+}
+
+/* ==========================================================================
+   DataTables — estilos alineados con el sistema (x-table / Flowbite)
+   ========================================================================== */
+
+:root {
+    --dt-header_border: 1px solid #e5e7eb;
+    --dt-header_padding: 0.75rem 1rem;
+    --dt-body_border: 1px solid #f3f4f6;
+    --dt-body_padding: 0.75rem 1rem;
+    --dt-footer_padding: 0.75rem 1rem;
+    --dt-control_color: #4b5563;
+
+    --dt-row_background: transparent;
+    --dt-row_background-hover: 249, 250, 251;
+    --dt-row_alpha-hover: 1;
+    --dt-row_alpha-stripe: 0;
+    --dt_background-selected: 2, 8, 48;
+    --dt_color-selected: 255, 255, 255;
+    --dt-column-ordering_background: 242, 201, 76;
+    --dt-column-ordering_alpha: 0.25;
+
+    --dt-order-arrow_color: rgb(75, 85, 99);
+    --dt-order-arrow_color-current: rgb(2, 8, 48);
+    --dt-order-header_outline-hover: 2px solid rgba(0, 0, 0, 0.04);
+
+    --dt-input_border: 1px solid #d1d5db;
+    --dt-input_border-radius: 0.5rem;
+    --dt-input_padding: 0.5rem 0.75rem;
+    --dt-input_background: #ffffff;
+    --dt-input_color: #111827;
+
+    --dt-paging-button_padding: 0.375rem 0.75rem;
+    --dt-paging-button_margin-left: 0.125rem;
+    --dt-paging-button_border-radius: 0.5rem;
+    --dt-paging-button_border: 1px solid transparent;
+    --dt-paging-button_color: #4b5563;
+    --dt-paging-button_background: transparent;
+    --dt-paging-button_box-shadow: none;
+    --dt-paging-button_color-disabled: #9ca3af;
+    --dt-paging-button_background-disabled: transparent;
+    --dt-paging-button_border-disabled: 1px solid transparent;
+    --dt-paging-button_background-current: #f2c94c;
+    --dt-paging-button_color-current: #020830;
+    --dt-paging-button_border-current: 1px solid #f2c94c;
+    --dt-paging-button_background-current-hover: #f2c94c;
+    --dt-paging-button_color-current-hover: #020830;
+    --dt-paging-button_border-current-hover: 1px solid #f2c94c;
+    --dt-paging-button_background-hover: #f3f4f6;
+    --dt-paging-button_color-hover: #111827;
+    --dt-paging-button_border-hover: 1px solid #f3f4f6;
+}
+
+.dt-container {
+    @apply relative w-full text-sm text-gray-700;
+}
+
+.dt-container .dt-processing {
+    @apply absolute top-1/2 left-1/2 z-10 m-0! w-auto! -translate-x-1/2 -translate-y-1/2
+           rounded-lg bg-white/90 px-4 py-2 text-sm text-gray-600 shadow;
+}
+
+div.dt-container div.dt-layout-row {
+    @apply my-2 flex-wrap gap-3;
+}
+
+div.dt-container div.dt-layout-row div.dt-layout-cell {
+    @apply gap-2;
+}
+
+div.dt-container .dt-search label,
+div.dt-container .dt-length label {
+    @apply flex items-center gap-2 text-sm font-medium whitespace-nowrap text-gray-600;
+}
+
+div.dt-container .dt-search input,
+div.dt-container .dt-length select {
+    @apply rounded-lg border-gray-300 bg-white py-2 text-sm text-gray-900 shadow-xs
+           focus:border-indigo-500 focus:ring-indigo-500;
+}
+
+div.dt-container .dt-search input {
+    @apply w-full max-w-xs pl-3;
+}
+
+div.dt-container .dt-length select {
+    @apply me-1 ps-2 pe-8;
+}
+
+div.dt-container .dt-info {
+    @apply text-sm text-gray-500;
+}
+
+div.dt-container .dt-paging {
+    @apply flex flex-wrap items-center gap-1;
+}
+
+div.dt-container .dt-paging .dt-paging-button {
+    @apply inline-flex min-w-9 items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors;
+}
+
+div.dt-container .dt-paging .dt-paging-button.current,
+div.dt-container .dt-paging .dt-paging-button.current:hover {
+    @apply !text-[#020830] font-semibold;
+    background-color: #f2c94c !important;
+    border-color: #f2c94c !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button:hover:not(.current):not(.disabled) {
+    @apply !text-gray-900 bg-gray-100;
+}
+
+div.dt-container .dt-paging .dt-paging-button.disabled,
+div.dt-container .dt-paging .dt-paging-button.disabled:hover,
+div.dt-container .dt-paging .dt-paging-button.disabled:active {
+    @apply !text-gray-400 cursor-default;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+div.dt-container .dt-paging .ellipsis {
+    @apply px-1 text-gray-400;
+}
+
+div.dt-container div.dt-layout-table {
+    @apply my-3 w-full overflow-x-auto rounded-xl border border-gray-200 shadow-sm;
+}
+
+table.dataTable {
+    @apply min-w-full text-sm;
+}
+
+table.dataTable thead th,
+table.dataTable thead td {
+    @apply bg-gray-50 px-4 py-3 text-left text-sm font-medium whitespace-nowrap text-gray-600;
+}
+
+table.dataTable thead {
+    @apply bg-gray-50;
+}
+
+table.dataTable tbody th,
+table.dataTable tbody td {
+    @apply px-4 py-3 align-middle;
+}
+
+table.dataTable > tbody > tr > th,
+table.dataTable > tbody > tr > td {
+    @apply border-t border-gray-100;
+}
+
+table.dataTable > tbody > tr:first-child > th,
+table.dataTable > tbody > tr:first-child > td {
+    @apply border-t-0;
+}
+
+table.dataTable > tbody > tr:hover > th,
+table.dataTable > tbody > tr:hover > td {
+    @apply bg-gray-50;
+}
+
+table.dataTable > tbody > tr.selected > th,
+table.dataTable > tbody > tr.selected > td {
+    box-shadow: none !important;
+    @apply bg-[#020830] text-white;
+}
+
+table.dataTable > tbody > tr.selected a {
+    @apply text-[#f2c94c];
+}
+
+table.dataTable > tbody > tr > td.sorting_1,
+table.dataTable > tbody > tr > td.sorting_2,
+table.dataTable > tbody > tr > td.sorting_3 {
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+table.dataTable .dt-column-order {
+    @apply ms-1;
+}
+
+@media screen and (max-width: 767px) {
+    div.dt-container div.dt-layout-row:not(.dt-layout-table) {
+        @apply my-1 items-start gap-2;
+    }
+
+    div.dt-container div.dt-layout-row:not(.dt-layout-table) div.dt-layout-cell {
+        @apply w-full text-left;
+    }
+
+    div.dt-container .dt-search input {
+        @apply max-w-none;
+    }
+
+    div.dt-container .dt-length select {
+        @apply me-0;
+    }
+
+    div.dt-container .dt-paging {
+        @apply justify-start;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    table.dataTable thead th,
+    table.dataTable thead td,
+    table.dataTable tbody th,
+    table.dataTable tbody td,
+    table.dataTable > tbody > tr > th,
+    table.dataTable > tbody > tr > td {
+        @apply px-3 py-2.5 text-xs;
+    }
+
+    div.dt-container .dt-paging .dt-paging-button {
+        @apply min-w-8 px-2 py-1 text-xs;
+    }
 }
