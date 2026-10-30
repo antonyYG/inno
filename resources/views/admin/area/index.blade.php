@@ -2,7 +2,7 @@
     @push('js')
         @vite(['resources/css/app.css', 'resources/js/tableArea.js'])
     @endpush
-    <div x-data="{ open: false }">
+    <div x-data="{ open: {{ $errors->has('nombre') ? 'true' : 'false' }} }">
 
         <x-header>
             Listado de Areas
@@ -34,7 +34,7 @@
 
                 <x-input name="nombre" value="{{ old('nombre') }}" />
 
-                <x-input-error for="name" />
+                <x-input-error for="nombre" />
 
                 <div class="mt-6 flex justify-end gap-2">
 

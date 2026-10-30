@@ -23,8 +23,11 @@ class PermissionSeeder extends Seeder
             'create.areas',
             'edit.areas',
             'delete.areas',
+            'read.areas',
+            'read.justificate',
             'mark.attendance',
-            'explain.absence'
+            'explain.absence',
+            'read.dashboard'
         ];
 
         foreach ($permissions as $permission) {

@@ -30,9 +30,10 @@ const tableUsuarios =new DataTable(tableUsuario, {
     },
     language: languages,
     columns: [
-        { data: 'id' },
-        { data: 'nombre' },
-        { data: 'email' },
+        { data: 'id',searchable: false },
+        { data: 'nombre',searchable: true },
+        { data: 'email',searchable: true },
+        { data: 'apellidos',searchable: true },
         { data: 'roles.0.name',searchable: false,orderable:false},
         { data: 'acciones', orderable: false, searchable: false },
     ],

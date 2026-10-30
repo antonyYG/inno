@@ -72,6 +72,11 @@ class AreaController extends Controller
         ]);
 
         $area->update($data);
+        session()->flash('swal',[
+            'icon' => 'success',
+            'title' => '!Ben Hecho¡',
+            'message' => 'area actualizada correctamente',
+        ]);
 
         return redirect()->route('admin.areas.index');
 

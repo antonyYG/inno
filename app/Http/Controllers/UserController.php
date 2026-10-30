@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditUser;
 use App\Http\Requests\UserStoreRequest;
 use App\Models\Area;
 use App\Models\User;
@@ -9,15 +10,26 @@ use App\Services\UserService;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
 
     public function __construct(
         protected UserService $userService
     ) {}
+
+    public static function middleware()
+    {
+        return [
+            new Middleware('can:read.users',only:['index']),
+            new Middleware('can:create.users',only:['create']),
+            new Middleware('can:edit.users',only:['edit']),
+        ];
+    }
 
     /**
      * Display a listing of the resource.
@@ -30,7 +42,7 @@ class UserController extends Controller
     public function data()
     {
         $query = User::with('roles')
-            ->select(['id', 'nombre', 'email']);
+            ->select(['id', 'nombre', 'email','estado','apellidos']);
 
         return DataTables::eloquent($query)
             ->filter(function ($query) {
@@ -39,7 +51,7 @@ class UserController extends Controller
                         $q->where('name', request('rol'));
                     });
                 }
-            })
+            },true)
             ->addColumn(
                 'acciones',
                 fn($user) =>
@@ -78,10 +90,11 @@ class UserController extends Controller
         } catch (Exception $e) {
             DB::rollback();
             session()->flash('swal', [
-                'message' => 'No se pudo crear al usuario',
+                'message' => 'No se pudo crear al usuario'.$e->getMessage(),
                 'title' => 'Fallido',
                 'icon' => 'error'
             ]);
+            return redirect()->route('admin.users.index');
         }
     }
 
@@ -98,15 +111,41 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        $areas = Area::select(['id','nombre'])->get();
+        return view('admin.users.edit',compact('user','areas'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(EditUser $request, User $user)
     {
-        //
+        $data = $request->validated();
+
+        try {
+            DB::beginTransaction();
+            if (empty($data['password'])) {
+                unset($data['password']);
+            }
+            $user->update($data);
+            DB::commit();
+            session()->flash('swal', [
+                'message' => 'Usuario Actualizado',
+                'title' => 'Exito',
+                'icon' => 'success'
+            ]);
+            return redirect()->route('admin.users.index');
+
+        } catch (Exception $e) {
+            DB::rollback();
+            session()->flash('swal', [
+                'message' => 'No se pudo actualizar al usuario'.$e->getMessage(),
+                'title' => 'Fallido',
+                'icon' => 'error'
+            ]);
+            return redirect()->route('admin.users.index');
+        }
+
     }
 
     /**
@@ -116,4 +155,20 @@ class UserController extends Controller
     {
         //
     }
+
+    public function Status(User $user){
+        $user->estado = !$user->estado;
+        $user->save();
+
+        return response()->json([
+            'estado' => (bool) $user->fresh()->estado,
+            'swal' => [
+                'title' => 'Éxito',
+                'message' => 'Estado cambiado con éxito',
+                'icon' => 'success',
+            ],
+        ]);
+
+    }
+
 }

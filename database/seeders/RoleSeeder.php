@@ -27,20 +27,25 @@ class RoleSeeder extends Seeder
             'create.areas',
             'edit.areas',
             'delete.areas',
-            'mark.attendance',
-            'explain.absence'
+            'read.areas',
+            'read.justificate',
+            'explain.absence',
+            'read.dashboard'
         ]);
 
         $user = User::find(1);
         $user->assignRole('admin');
 
         $practicing = Role::create([
-            'name' => 'practicing'
+            'name' => 'practicante'
         ]);
 
         $practicing->syncPermissions([
             'read.calendar',
-            'mark.attendance'
+            'mark.attendance',
+            'read.justificate',
+            'read.calendar',
+            'read.dashboard'
         ]);
 
 

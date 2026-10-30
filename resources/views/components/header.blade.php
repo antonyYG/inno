@@ -1,13 +1,11 @@
-<div class="bg-white shadow-xl rounded-xl m-2 sm:m-4 p-3 sm:p-4">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 class="text-xl sm:text-2xl font-semibold text-heading">
-            {{ $slot }}
-        </h1>
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <h1 class="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
+        {{ $slot }}
+    </h1>
 
-        @isset($actions)
-            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                {{ $actions }}
-            </div>
-        @endisset
-    </div>
+    @isset($actions)
+        <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+            {{ $actions }}
+        </div>
+    @endisset
 </div>

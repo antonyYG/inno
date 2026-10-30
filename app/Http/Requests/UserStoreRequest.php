@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+
 class UserStoreRequest extends FormRequest
 {
     /**
@@ -24,11 +25,17 @@ class UserStoreRequest extends FormRequest
     {
         return [
             'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
             'rol' => 'required',
             'email' => 'required|email|unique:usuarios,email',
             'password' => 'required',
-            'discord_id' =>'required|unique:usuarios,discord_id',
-            'area_id' => 'required|exists:areas,id',
+            'discord_id' => [
+                'required_if:rol,practicing',
+                ...($this->input('rol') === 'practicing'
+                    ? [Rule::unique('usuarios', 'discord_id')]
+                    : []),
+            ],
+            'area_id' => 'required_if:rol,practicing|exists:areas,id',
             'fecha_inicio' => 'nullable',
             'fecha_fin' => 'nullable',
         ];

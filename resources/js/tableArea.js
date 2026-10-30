@@ -22,11 +22,19 @@ new DataTable(areaTable,{
     processing: false,
     pageLength: 10,
     ajax:areaTable.dataset.url,
+    order: [[0, 'desc']],
     language: languages,
     columns: [
         { data: 'id' },
         { data: 'nombre' },
-        { data: 'created_at' },
-        { data: 'acciones' },
+        {
+            data: 'created_at',
+            render: function (data, type, row) {
+                if (!data) return '';
+
+                return data.split('T')[0];
+            }
+        },
+        { data: 'acciones', searchable:false, orderable: false },
     ],
 });

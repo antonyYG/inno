@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center justify-start rtl:justify-end">
         <button data-drawer-target="top-bar-sidebar" data-drawer-toggle="top-bar-sidebar" aria-controls="top-bar-sidebar" type="button" class="sm:hidden text-slate-200 bg-transparent box-border border border-transparent hover:bg-white/10 focus:ring-4 focus:ring-[#f2c94c]/30 font-medium leading-5 rounded-lg text-sm p-2 focus:outline-none">
-            <span class="sr-only">Open sidebar</span>
+            <span class="sr-only">Abrir menú lateral</span>
             <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h10"/>
    </svg>
@@ -21,9 +21,9 @@
       <div class="flex items-center">
           <div class="flex items-center ms-3">
             <div>
-              <button type="button" class="flex text-sm bg-[#0a1547] rounded-full ring-2 ring-transparent focus:ring-[#f2c94c]" aria-expanded="false" data-dropdown-toggle="dropdown-user">
-                <span class="sr-only">Open user menu</span>
-                <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="user photo">
+              <button type="button" class="flex text-sm bg-[#0a1547] rounded-full ring-2 ring-transparent focus:outline-none focus:ring-[#f2c94c]" aria-haspopup="true" aria-expanded="false" data-dropdown-toggle="dropdown-user">
+                <span class="sr-only">Abrir menú de usuario</span>
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2c94c] text-sm font-semibold text-[#020830]" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
               </button>
             </div>
             <div class="z-50 hidden bg-white border border-gray-100 rounded-xl shadow-lg w-48" id="dropdown-user">
@@ -42,7 +42,7 @@
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="inline-flex items-center w-full p-2 hover:bg-[#f2c94c]/10 hover:text-[#020830] rounded-lg transition-colors" role="menuitem">Cerrar Sesion</button>
+                        <button type="submit" class="inline-flex items-center w-full p-2 hover:bg-[#f2c94c]/10 hover:text-[#020830] rounded-lg transition-colors" role="menuitem">Cerrar sesión</button>
                     </form>
                 </li>
               </ul>

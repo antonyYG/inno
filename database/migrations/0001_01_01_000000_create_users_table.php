@@ -14,13 +14,12 @@ return new class extends Migration
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
+            $table->string('apellidos');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('estado')->default(true);
-            $table->date('fecha_inicio')->nullable();
-            $table->date('fecha_fin')->nullable();
-            $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
+            $table->foreignId('area_id')->nullable()->constrained('areas')->onDelete('cascade');
             $table->string('discord_id')->unique()->nullable();
             $table->rememberToken();
             $table->timestamps();
