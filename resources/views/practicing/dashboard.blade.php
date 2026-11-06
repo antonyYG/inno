@@ -165,7 +165,7 @@
 
         {{-- Distribución semanal de asistencia --}}
         <section aria-label="Distribución semanal de asistencia">
-            <x-weekly-attendance-doughnut
+            <x-weekly-worked-hours
                 :attendance-week="$dataDahboard['asistenciaSemana']"
             />
         </section>

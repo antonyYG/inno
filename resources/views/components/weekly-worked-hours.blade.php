@@ -2,7 +2,10 @@
     'attendanceWeek',
 ])
 
+
 @php
+    use App\Enum\EstadoAsistenciaEnum;
+
     $palette = [
         'asistio' => [
             'nombre' => 'Asistencias',
@@ -26,10 +29,27 @@
         ],
     ];
 
-    // Agrupar los registros según su tipo de asistencia.
-    $records = collect($attendanceWeek)
+    // Normalizar los registros y convertir el Enum a string.
+    $registros = collect($attendanceWeek)->map(function ($item) {
+        $tipo = data_get($item, 'tipo');
+
+        return [
+            'fecha' => data_get($item, 'fecha'),
+            'tipo' => $tipo instanceof \BackedEnum
+                ? $tipo->value
+                : $tipo,
+        ];
+    });
+
+    // Una sola asistencia por fecha.
+    $registros = $registros
+        ->unique('fecha')
+        ->values();
+
+    // Contar registros por tipo.
+    $records = $registros
         ->groupBy('tipo')
-        ->map(fn ($items) => (int) $items->sum('total'));
+        ->map(fn ($items) => $items->count());
 
     $labels = [];
     $values = [];
@@ -45,9 +65,9 @@
 
     $total = array_sum($values);
 
-    // Identificadores únicos para permitir varias instancias.
     $chartId = 'weeklyAttendanceDoughnut-' . uniqid();
 @endphp
+
 
 <div
     id="{{ $chartId }}-container"

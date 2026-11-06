@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Enum\EstadoAsistenciaEnum;
 use App\Models\Asistencia;
+use App\Services\tickService;
 use Illuminate\Http\Request;
 
 class TickController extends Controller
 {
+
+    public function __construct(
+        protected tickService $tickService
+    ){}
+
     public function index()
     {
-        $usuario = auth()->user();
+        $asistencia = $this->tickService->getInformation();
 
-        $asistencia = Asistencia::where('usuario_id', $usuario->id)
-            ->whereDate('fecha', today())
-            ->first();
+        // return $asistencia;
 
         return view('practicing.tick.index', compact('asistencia'));
     }
