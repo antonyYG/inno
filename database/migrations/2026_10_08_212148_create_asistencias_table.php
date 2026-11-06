@@ -19,7 +19,7 @@ return new class extends Migration
             $table->time('hora_inicio')->nullable();
             $table->time('hora_fin')->nullable();
             $table->time('tiempo_trabajado')->nullable();
-            $table->enum('tipo',['asistio','falto','tardanza']);
+            $table->enum('tipo',['asistio','falto','tardanza','pendiente','justificado'])->default('pendiente');
             $table->timestamps();
         });
     }

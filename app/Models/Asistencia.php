@@ -12,16 +12,23 @@ class Asistencia extends Model
         'fecha',
         'hora_inicio',
         'hora_fin',
-        'tipo'
+        'tipo',
+        'tiempo_trabajado',
     ];
 
     protected $casts = [
-        'tipo' => EstadoAsistenciaEnum::class
+        'tipo' => EstadoAsistenciaEnum::class,
+
     ];
 
     public function usuario()
     {
         return $this->belongsTo(User::class,'usuario_id');
+    }
+
+    public function justificaciones()
+    {
+        return $this->hasMany(Justificacion::class,'asistencia_id');
     }
 
 }

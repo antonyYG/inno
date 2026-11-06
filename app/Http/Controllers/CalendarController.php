@@ -14,6 +14,9 @@ class CalendarController extends Controller
 
     public function index()
     {
+        if (auth()->user()->hasRole('practicante')) {
+            return view('practicing.calendar.index');
+        }
         return view('admin.calendar.index');
     }
 

@@ -10,10 +10,13 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "guzzlehttp/guzzle": "7.16.1",
+        "guzzlehttp/psr7": "2.13.2",
         "laravel-lang/common": "^6.8",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "spatie/laravel-permission": "^8.3",
+        "team-reflex/discord-php": "10.71",
         "yajra/laravel-datatables-oracle": "^13.3"
     },
     "require-dev": {

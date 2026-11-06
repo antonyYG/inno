@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('asistencia_id')->constrained('asistencias')->onDelete('cascade');
-            $table->text('motivo');
-            $table->string('evidencia');
+            $table->text('descripcion');
+            $table->string('archivo_path');
             $table->enum('estado', ['pendiente', 'aprobada', 'rechazada'])->default('pendiente');
+            $table->enum('tipo',['evidencia','justificacion'])->default('justificacion');
             $table->date('fecha');
 
             $table->timestamps();

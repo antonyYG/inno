@@ -83,7 +83,7 @@
                 </fieldset>
 
                 {{-- Datos de practicante (solo si el rol es Practicante) --}}
-                <fieldset x-show="open == 'practicing'" x-cloak>
+                <fieldset x-show="open == 'practicante'" x-cloak>
                     <legend class="mb-4 w-full border-b border-slate-100 pb-2 text-base font-semibold text-slate-900">
                         Datos del practicante
                     </legend>

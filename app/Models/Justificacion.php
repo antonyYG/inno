@@ -6,15 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Justificacion extends Model
 {
+    protected $table = 'justificaciones';
+
     protected $fillable = [
-        'falta_id',
-        'descripcion',
+        'asistencia_id',
         'archivo_path',
-        'estado',
+        'fecha',
+        'tipo',
+        'descripcion',
     ];
 
-    public function falta()
+    public function asistencia()
     {
-        return $this->belongsTo(Falta::class,'falta_id');
+        return $this->belongsTo(Asistencia::class, 'asistencia_id');
     }
+
 }
