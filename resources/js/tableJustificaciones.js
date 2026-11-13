@@ -26,8 +26,9 @@ new DataTable(justificaionTable,{
     columns: [
         { data: 'id' },
         { data: 'fecha' },
-        { data: 'usuario.nombre' },
+        { data: 'usuario' },
         { data: 'tipo' },
+        { data: 'estado' },
         { data: 'acciones' },
 
     ],

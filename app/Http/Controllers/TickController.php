@@ -9,10 +9,9 @@ use Illuminate\Http\Request;
 
 class TickController extends Controller
 {
-
     public function __construct(
         protected tickService $tickService
-    ){}
+    ) {}
 
     public function index()
     {
@@ -28,7 +27,7 @@ class TickController extends Controller
         $usuario = auth()->user();
 
         // Verificar que el practicante tenga vinculado Discord.
-        if (!$usuario->discord_id) {
+        if (! $usuario->discord_id) {
             return back()->with(
                 'error',
                 'Primero debes registrar tu cuenta de Discord.'
@@ -36,7 +35,7 @@ class TickController extends Controller
         }
 
         // Verificar que su cuenta esté activa.
-        if (!$usuario->estado) {
+        if (! $usuario->estado) {
             return back()->with(
                 'error',
                 'Tu cuenta se encuentra inactiva.'
@@ -44,12 +43,12 @@ class TickController extends Controller
         }
 
         // La jornada de mañana termina a las 13:00.
-        if (now()->format('H:i:s') >= '13:00:00') {
-            return back()->with(
-                'error',
-                'El horario de asistencia ha finalizado.'
-            );
-        }
+        // if (now()->format('H:i:s') >= '13:00:00') {
+        //     return back()->with(
+        //         'error',
+        //         'El horario de asistencia ha finalizado.'
+        //     );
+        // }
 
         // Crear el registro solamente si todavía no existe.
         $asistencia = Asistencia::firstOrCreate(
@@ -62,7 +61,7 @@ class TickController extends Controller
             ]
         );
 
-        if (!$asistencia->wasRecentlyCreated) {
+        if (! $asistencia->wasRecentlyCreated) {
             return back()->with(
                 'info',
                 'Ya registraste tu asistencia de hoy.'
@@ -74,5 +73,4 @@ class TickController extends Controller
             'Asistencia iniciada. Estamos esperando la conexión de Discord.'
         );
     }
-
 }

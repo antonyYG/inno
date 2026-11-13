@@ -13,6 +13,7 @@
                     <th>Fecha</th>
                     <th>Nombre</th>
                     <th>Tipo</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>

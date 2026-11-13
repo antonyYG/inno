@@ -6,6 +6,11 @@
         title="Editar" aria-label="Editar usuario">
         <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
     </a>
+    <a href="{{ route('admin.certificate.generate', $user) }}"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-indigo-600 transition-colors hover:bg-indigo-50"
+        title="Certificado" aria-label="Certificado">
+        <i class="fa-regular fa-file" aria-hidden="true"></i>
+    </a>
 
     <label class="inline-flex cursor-pointer items-center" title="Activar / desactivar">
         <input type="checkbox" class="peer sr-only js-toggle-status" role="switch" data-id="{{ $user->id }}"

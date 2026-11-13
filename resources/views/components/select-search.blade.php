@@ -1,16 +1,3 @@
-{{--
-    Uso:
-    <x-select-search
-        id="area_id"
-        name="area_id"
-        :options="$areas->pluck('nombre', 'id')"
-        :value="old('area_id')"
-        placeholder="Selecciona un área"
-        search-placeholder="Buscar área..."
-    />
-    - options: arreglo o colección [valor => etiqueta]
-    - value: valor preseleccionado (usa old() para conservarlo tras un error)
---}}
 @props([
     'name',
     'id' => null,
@@ -60,6 +47,7 @@
             if (this.filtered.length) this.choose(this.filtered[0]);
         }
     }"
+    x-modelable="value"
     @click.outside="close()"
     @keydown.escape.window="if (isOpen) { close(); $refs.trigger.focus(); }"
 >

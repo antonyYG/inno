@@ -200,8 +200,8 @@
                             </section>
                         </template>
 
-                        <!-- Mi evidencia (solo una por jornada, no aplica si faltó) -->
-                        <template x-if="selectedAttendance.tipo !== 'falto'">
+                        <!-- Mi evidencia (solo una por jornada; no aplica si faltó o está justificada) -->
+                        <template x-if="selectedAttendance.tipo !== 'falto' && selectedAttendance.tipo !== 'justificado'">
                             <section>
 
                                 <div class="flex items-center justify-between mb-1">
@@ -251,11 +251,37 @@
                                             <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-400 group-hover:text-gray-700 shrink-0"></i>
                                         </a>
 
-                                        <div class="flex items-start gap-3 rounded-xl bg-green-50 border border-green-200 px-4 py-3">
+                                        <div
+                                            x-show="evidenciaPresentada().estado === 'aprobada'"
+                                            class="flex items-start gap-3 rounded-xl bg-green-50 border border-green-200 px-4 py-3">
                                             <i class="fa-solid fa-circle-check text-green-600 mt-0.5"></i>
                                             <p class="text-sm text-green-800">
-                                                Ya presentaste tu evidencia de esta jornada. Tu asistencia queda validada.
+                                                Tu evidencia fue aceptada. Tu asistencia quedó validada.
                                             </p>
+                                        </div>
+
+                                        <!-- Esperando validación del admin -->
+                                        <div
+                                            x-show="evidenciaPresentada().estado === 'pendiente'"
+                                            class="flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                                            <i class="fa-regular fa-hourglass-half text-amber-600 mt-0.5"></i>
+                                            <p class="text-sm text-amber-800">
+                                                Evidencia enviada, esperando validación del administrador.
+                                            </p>
+                                        </div>
+
+                                        <!-- Rechazada por el admin -->
+                                        <div
+                                            x-show="evidenciaPresentada().estado === 'rechazada'"
+                                            class="flex items-start gap-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+                                            <i class="fa-solid fa-circle-xmark text-red-600 mt-0.5"></i>
+                                            <div class="text-sm text-red-800">
+                                                <p>Tu evidencia fue rechazada.</p>
+                                                <p
+                                                    class="mt-1 whitespace-pre-line"
+                                                    x-show="evidenciaPresentada().observacion"
+                                                    x-text="'Observación: ' + evidenciaPresentada().observacion"></p>
+                                            </div>
                                         </div>
 
                                     </div>
@@ -378,8 +404,50 @@
 
                         </template>
 
+                        <!-- Falta definitiva: la evidencia fue rechazada, no admite justificación -->
+                        <template x-if="selectedAttendance.tipo === 'falto' && evidenciaRechazada()">
+
+                            <section class="pt-8 border-t border-gray-100">
+
+                                <h4 class="text-sm font-semibold text-gray-900 mb-1">
+                                    Asistencia rechazada
+                                </h4>
+
+                                <div class="rounded-2xl border border-red-200 bg-red-50 overflow-hidden">
+
+                                    <div class="flex items-start gap-3 px-4 py-3">
+                                        <i class="fa-solid fa-circle-xmark text-red-600 mt-0.5"></i>
+                                        <div class="text-sm text-red-800">
+                                            <p>Tu asistencia fue rechazada y se considera como falta.</p>
+                                            <p
+                                                class="mt-1 whitespace-pre-line"
+                                                x-show="evidenciaRechazada().observacion"
+                                                x-text="'Observación del administrador: ' + evidenciaRechazada().observacion"></p>
+                                        </div>
+                                    </div>
+
+                                    <a
+                                        :href="evidenciaRechazada().url"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="flex items-center justify-between gap-3 px-4 py-3 border-t border-red-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-400 transition">
+
+                                        <span class="flex items-center gap-2">
+                                            <i class="fa-regular fa-file-lines"></i>
+                                            Ver evidencia rechazada
+                                        </span>
+
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-400"></i>
+                                    </a>
+
+                                </div>
+
+                            </section>
+
+                        </template>
+
                         <!-- Justificación de falta -->
-                        <template x-if="selectedAttendance.tipo === 'falto'">
+                        <template x-if="selectedAttendance.tipo === 'falto' && !evidenciaRechazada()">
 
                             <section class="pt-8 border-t border-gray-100">
 
@@ -392,7 +460,7 @@
                                 </p>
 
                                 <!-- Ya enviada -->
-                                <template x-if="selectedAttendance.justificacion">
+                                <template x-if="selectedAttendance.justificacion && selectedAttendance.justificacion.estado !== 'rechazada'">
 
                                     <div class="rounded-2xl border border-gray-200 overflow-hidden">
 
@@ -401,7 +469,7 @@
 
                                             <p
                                                 class="text-sm text-gray-900 mt-1.5 leading-relaxed whitespace-pre-line"
-                                                x-text="selectedAttendance.justificacion.motivo">
+                                                x-text="selectedAttendance.justificacion.descripcion || selectedAttendance.justificacion.motivo">
                                             </p>
                                         </div>
 
@@ -419,12 +487,56 @@
                                             <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-400"></i>
                                         </a>
 
+                                        <!-- Esperando revisión del admin -->
+                                        <div
+                                            x-show="selectedAttendance.justificacion.estado === 'pendiente'"
+                                            class="flex items-start gap-3 border-t border-gray-200 bg-amber-50 px-4 py-3">
+                                            <i class="fa-regular fa-hourglass-half text-amber-600 mt-0.5"></i>
+                                            <p class="text-sm text-amber-800">
+                                                Ya subiste tu justificación, esperando la revisión del administrador.
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </template>
+
+                                <!-- Rechazada: se muestra la observación y se permite volver a enviar -->
+                                <template x-if="selectedAttendance.justificacion && selectedAttendance.justificacion.estado === 'rechazada'">
+
+                                    <div class="rounded-2xl border border-red-200 bg-red-50 overflow-hidden mb-5">
+
+                                        <div class="flex items-start gap-3 px-4 py-3">
+                                            <i class="fa-solid fa-circle-xmark text-red-600 mt-0.5"></i>
+                                            <div class="text-sm text-red-800">
+                                                <p>Tu justificación fue rechazada. Puedes volver a enviarla.</p>
+                                                <p
+                                                    class="mt-1 whitespace-pre-line"
+                                                    x-show="selectedAttendance.justificacion.observacion"
+                                                    x-text="'Observación del administrador: ' + selectedAttendance.justificacion.observacion"></p>
+                                            </div>
+                                        </div>
+
+                                        <a
+                                            :href="selectedAttendance.justificacion.url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="flex items-center justify-between gap-3 px-4 py-3 border-t border-red-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-400 transition">
+
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-regular fa-file-lines"></i>
+                                                Ver documento rechazado
+                                            </span>
+
+                                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-400"></i>
+                                        </a>
+
                                     </div>
 
                                 </template>
 
                                 <!-- Formulario -->
-                                <template x-if="!selectedAttendance.justificacion">
+                                <template x-if="!selectedAttendance.justificacion || selectedAttendance.justificacion.estado === 'rechazada'">
 
                                     <form
                                         :action="justificacionUrl()"
@@ -496,6 +608,57 @@
                                     </form>
 
                                 </template>
+
+                            </section>
+
+                        </template>
+
+                        <!-- Falta ya justificada -->
+                        <template x-if="selectedAttendance.tipo === 'justificado' && selectedAttendance.justificacion">
+
+                            <section class="pt-8 border-t border-gray-100">
+
+                                <h4 class="text-sm font-semibold text-gray-900 mb-1">
+                                    Asistencia justificada
+                                </h4>
+
+                                <div class="rounded-2xl border border-green-200 bg-green-50 overflow-hidden">
+
+                                    <div class="flex items-start gap-3 px-4 py-3">
+                                        <i class="fa-solid fa-circle-check text-green-600 mt-0.5"></i>
+                                        <div class="text-sm text-green-800">
+                                            <p>Tu falta ya fue justificada.</p>
+                                            <p
+                                                class="mt-1 whitespace-pre-line"
+                                                x-show="selectedAttendance.justificacion.observacion"
+                                                x-text="'Observación del administrador: ' + selectedAttendance.justificacion.observacion"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-4 py-3 border-t border-green-200 bg-white">
+                                        <p class="text-xs font-medium text-gray-500">Motivo presentado</p>
+
+                                        <p
+                                            class="text-sm text-gray-900 mt-1 leading-relaxed whitespace-pre-line"
+                                            x-text="selectedAttendance.justificacion.descripcion || selectedAttendance.justificacion.motivo">
+                                        </p>
+                                    </div>
+
+                                    <a
+                                        :href="selectedAttendance.justificacion.url"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="flex items-center justify-between gap-3 px-4 py-3 border-t border-green-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-400 transition">
+
+                                        <span class="flex items-center gap-2">
+                                            <i class="fa-regular fa-file-lines"></i>
+                                            Ver documento enviado
+                                        </span>
+
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-400"></i>
+                                    </a>
+
+                                </div>
 
                             </section>
 
@@ -676,6 +839,13 @@
                         return (this.selectedAttendance?.evidencias?.length || 0) > 0;
                     },
 
+                    // Evidencia rechazada por el admin: la falta es definitiva
+                    evidenciaRechazada() {
+                        return this.selectedAttendance?.evidencias?.find(
+                            (evidencia) => evidencia.estado === 'rechazada'
+                        ) || null;
+                    },
+
                     evidenciaPresentada() {
                         return this.selectedAttendance?.evidencias?.[0] || null;
                     },
@@ -683,6 +853,7 @@
                     puedeSubirEvidencia() {
                         return !!this.selectedAttendance &&
                             this.selectedAttendance.tipo !== 'falto' &&
+                            this.selectedAttendance.tipo !== 'justificado' &&
                             !this.tieneEvidencia() &&
                             this.horarioHabilitado();
                     },
@@ -692,7 +863,8 @@
                             pendiente: 'Pendiente',
                             asistio: 'Asistió',
                             tardanza: 'Tardanza',
-                            falto: 'Falta'
+                            falto: 'Falta',
+                            justificado: 'Justificado'
                         };
 
                         return labels[tipo] || tipo;
@@ -703,7 +875,8 @@
                             pendiente: 'bg-yellow-50 text-yellow-700 ring-1 ring-inset ring-yellow-200',
                             asistio: 'bg-green-50 text-green-700 ring-1 ring-inset ring-green-200',
                             tardanza: 'bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200',
-                            falto: 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-200'
+                            falto: 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-200',
+                            justificado: 'bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-200'
                         };
 
                         return classes[tipo] || 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200';
@@ -714,7 +887,8 @@
                             pendiente: 'bg-yellow-500',
                             asistio: 'bg-green-500',
                             tardanza: 'bg-orange-500',
-                            falto: 'bg-red-500'
+                            falto: 'bg-red-500',
+                            justificado: 'bg-purple-500'
                         };
 
                         return classes[tipo] || 'bg-gray-400';
@@ -725,7 +899,8 @@
                             pendiente: 'fa-regular fa-hourglass-half',
                             asistio: 'fa-solid fa-check',
                             tardanza: 'fa-regular fa-clock',
-                            falto: 'fa-solid fa-xmark'
+                            falto: 'fa-solid fa-xmark',
+                            justificado: 'fa-solid fa-circle-check'
                         };
 
                         return icons[tipo] || 'fa-regular fa-calendar';

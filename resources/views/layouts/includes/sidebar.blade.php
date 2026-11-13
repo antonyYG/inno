@@ -35,6 +35,13 @@
             'isRoute' => request()->routeIs('admin.tick.index'),
             'permiso' => 'mark.attendance'
         ],
+        [
+            "name" => "Reportes",
+            "icon" => "fa-solid fa-file-circle-check",
+            "route" => "admin.reportes.index",
+            'isRoute' => request()->routeIs('admin.reportes.index'),
+            'permiso' => 'read.users'
+        ],
     ]
 @endphp
 

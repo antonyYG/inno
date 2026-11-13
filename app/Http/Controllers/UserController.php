@@ -7,17 +7,19 @@ use App\Http\Requests\UserStoreRequest;
 use App\Models\Area;
 use App\Models\User;
 use App\Services\UserService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use PhpOffice\PhpWord\TemplateProcessor;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller implements HasMiddleware
 {
-
     public function __construct(
         protected UserService $userService
     ) {}
@@ -25,9 +27,9 @@ class UserController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware('can:read.users',only:['index']),
-            new Middleware('can:create.users',only:['create']),
-            new Middleware('can:edit.users',only:['edit']),
+            new Middleware('can:read.users', only: ['index']),
+            new Middleware('can:create.users', only: ['create']),
+            new Middleware('can:edit.users', only: ['edit']),
         ];
     }
 
@@ -42,7 +44,7 @@ class UserController extends Controller implements HasMiddleware
     public function data()
     {
         $query = User::with('roles')
-            ->select(['id', 'nombre', 'email','estado','apellidos']);
+            ->select(['id', 'nombre', 'email', 'estado', 'apellidos']);
 
         return DataTables::eloquent($query)
             ->filter(function ($query) {
@@ -51,11 +53,10 @@ class UserController extends Controller implements HasMiddleware
                         $q->where('name', request('rol'));
                     });
                 }
-            },true)
+            }, true)
             ->addColumn(
                 'acciones',
-                fn($user) =>
-                view('admin.users.actions', compact('user'))->render()
+                fn ($user) => view('admin.users.actions', compact('user'))->render()
             )
             ->rawColumns(['acciones'])
             ->toJson();
@@ -67,6 +68,7 @@ class UserController extends Controller implements HasMiddleware
     public function create()
     {
         $areas = Area::select('id', 'nombre')->get();
+
         return view('admin.users.create', compact('areas'));
     }
 
@@ -84,16 +86,18 @@ class UserController extends Controller implements HasMiddleware
             session()->flash('swal', [
                 'message' => 'usuario Creado',
                 'title' => 'Exito',
-                'icon' => 'success'
+                'icon' => 'success',
             ]);
+
             return redirect()->route('admin.users.index');
         } catch (Exception $e) {
             DB::rollback();
             session()->flash('swal', [
                 'message' => 'No se pudo crear al usuario'.$e->getMessage(),
                 'title' => 'Fallido',
-                'icon' => 'error'
+                'icon' => 'error',
             ]);
+
             return redirect()->route('admin.users.index');
         }
     }
@@ -111,8 +115,9 @@ class UserController extends Controller implements HasMiddleware
      */
     public function edit(User $user)
     {
-        $areas = Area::select(['id','nombre'])->get();
-        return view('admin.users.edit',compact('user','areas'));
+        $areas = Area::select(['id', 'nombre'])->get();
+
+        return view('admin.users.edit', compact('user', 'areas'));
     }
 
     /**
@@ -132,8 +137,9 @@ class UserController extends Controller implements HasMiddleware
             session()->flash('swal', [
                 'message' => 'Usuario Actualizado',
                 'title' => 'Exito',
-                'icon' => 'success'
+                'icon' => 'success',
             ]);
+
             return redirect()->route('admin.users.index');
 
         } catch (Exception $e) {
@@ -141,8 +147,9 @@ class UserController extends Controller implements HasMiddleware
             session()->flash('swal', [
                 'message' => 'No se pudo actualizar al usuario'.$e->getMessage(),
                 'title' => 'Fallido',
-                'icon' => 'error'
+                'icon' => 'error',
             ]);
+
             return redirect()->route('admin.users.index');
         }
 
@@ -156,8 +163,9 @@ class UserController extends Controller implements HasMiddleware
         //
     }
 
-    public function Status(User $user){
-        $user->estado = !$user->estado;
+    public function Status(User $user)
+    {
+        $user->estado = ! $user->estado;
         $user->save();
 
         return response()->json([
@@ -171,4 +179,43 @@ class UserController extends Controller implements HasMiddleware
 
     }
 
+    public function getCertificate(Request $request, User $user)
+    {
+        $user->load(['asistencias', 'area']);
+
+        // Tiempo total
+        $segundos = $user->asistencias->sum(
+            fn ($a) => strtotime($a->tiempo_trabajado ?? '00:00:00') - strtotime('00:00:00')
+        );
+        $horas = floor($segundos / 3600);
+        $minutos = floor(($segundos % 3600) / 60);
+        $tiempo = $horas.' horas'.($minutos > 0 ? " y {$minutos} minutos" : '');
+
+        // Primer y último día de asistencia
+        $fechas = $user->asistencias->map(fn ($a) => Carbon::parse($a->fecha ?? $a->created_at));
+        $formato = 'd \d\e F \d\e Y';
+
+        $template = new TemplateProcessor(storage_path('app/plantillas/certificado.docx'));
+
+        $template->setValue('nombre', mb_strtoupper($user->nombre.' '.$user->apellidos));
+        $template->setValue('area', $user->area->nombre ?? '________');
+        $template->setValue('fecha_inicio', $fechas->min()?->locale('es')->translatedFormat($formato) ?? '________');
+        $template->setValue('fecha_fin', $fechas->max()?->locale('es')->translatedFormat($formato) ?? '________');
+        $template->setValue('tiempo', $tiempo);
+        $template->setValue('fecha_emision', now()->locale('es')->translatedFormat($formato));
+
+        // Datos que no guardas en BD: se llenan desde el formulario o quedan en blanco
+        $template->setValue('dni', $request->input('dni', '________'));
+        $template->setValue('carrera', $request->input('carrera', '________________'));
+        $template->setValue('institucion', $request->input('institucion', '________'));
+        $template->setValue('semestre', $request->input('semestre', '__'));
+
+        File::ensureDirectoryExists(storage_path('app/temp'));
+        $path = storage_path('app/temp/certificado_'.$user->id.'.docx');
+        $template->saveAs($path);
+
+        return response()->download($path, 'certificado_'.$user->apellidos.'.docx')
+            ->deleteFileAfterSend(true);
+
+    }
 }

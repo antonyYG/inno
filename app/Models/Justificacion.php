@@ -13,6 +13,8 @@ class Justificacion extends Model
         'archivo_path',
         'fecha',
         'tipo',
+        'estado',
+        'observacion',
         'descripcion',
     ];
 
@@ -20,5 +22,4 @@ class Justificacion extends Model
     {
         return $this->belongsTo(Asistencia::class, 'asistencia_id');
     }
-
 }

@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de asistencias</title>
+
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            color: #334155;
+        }
+
+        h2 {
+            text-align: center;
+            color: #020830;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #020830;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 9px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .total {
+            margin-top: 15px;
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>REPORTE DE ASISTENCIAS</h2>
+
+    <p class="subtitle">
+        PractiControl - CRUD AGENCY
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Practicante</th>
+                <th>Fecha</th>
+                <th>Hora de ingreso</th>
+                <th>Hora de salida</th>
+                <th>Tiempo trabajado</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+
+        <tbody>
+    @forelse($asistencias as $asistencia)
+        <tr>
+            <td>{{ $loop->iteration }}</td>
+            <td>
+                {{ $asistencia->usuario->nombre }}
+                {{ $asistencia->usuario->apellidos }}
+            </td>
+            <td>{{ $asistencia->fecha }}</td>
+            <td>{{ $asistencia->hora_inicio ?? '-' }}</td>
+            <td>{{ $asistencia->hora_fin ?? '-' }}</td>
+            <td>{{ $asistencia->tiempo_trabajado ?? '-' }}</td>
+            <td>{{ $asistencia->tipo }}</td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="7" style="text-align: center;">
+                No se encontraron registros.
+            </td>
+        </tr>
+    @endforelse
+</tbody>
+    </table>
+
+    <p class="total">
+        Total de registros: {{ $asistencias->count() }}
+    </p>
+
+</body>
+</html>

@@ -70,7 +70,7 @@
                                 <option value="admin" {{ $rolActual == 'admin' ? 'selected' : '' }}>
                                     Admin
                                 </option>
-                                <option value="practicing" {{ $rolActual == 'practicing' ? 'selected' : '' }}>
+                                <option value="practicante" {{ $rolActual == 'practicante' ? 'selected' : '' }}>
                                     Practicante
                                 </option>
                             </x-select>
