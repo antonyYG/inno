@@ -43,10 +43,10 @@ class AttendanceDiscordService
         $now = now();
 
         // Turno de mañana: 08:00 a 13:00.
-        if ($now->format('H:i:s') < '08:00:00' ||
-            $now->format('H:i:s') >= '13:00:00') {
-            return;
-        }
+        // if ($now->format('H:i:s') < '08:00:00' ||
+        //     $now->format('H:i:s') >= '13:00:00') {
+        //     return;
+        // }
 
         $key = "attendance:{$asistencia->id}:connection";
 
@@ -102,11 +102,11 @@ class AttendanceDiscordService
             $fin = now();
 
             // Nunca contabilizar después de las 13:00.
-            $limite = $fin->copy()->setTime(13, 0, 0);
+            // $limite = $fin->copy()->setTime(13, 0, 0);
 
-            if ($fin->greaterThan($limite)) {
-                $fin = $limite;
-            }
+            // if ($fin->greaterThan($limite)) {
+            //     $fin = $limite;
+            // }
 
             $segundosNuevos = max(0, (int) $inicio->diffInSeconds($fin));
 

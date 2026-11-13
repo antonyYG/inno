@@ -17,7 +17,9 @@ class ReporteController extends Controller
 
     public function index()
     {
-        $practicantes = User::select('id', 'nombre', 'apellidos')
+        $practicantes = User::role('practicante')
+            ->select('id', 'nombre', 'apellidos')
+            ->where('estado',1)
             ->get()
             ->mapWithKeys(fn ($usuario) => [
                 $usuario->id => $usuario->nombre.' '.$usuario->apellidos,
