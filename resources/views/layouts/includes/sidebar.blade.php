@@ -42,6 +42,13 @@
             'isRoute' => request()->routeIs('admin.reportes.index'),
             'permiso' => 'read.users'
         ],
+        [
+            "name" => "Auditorias",
+            "icon" => "fa-solid fa-file-circle-check",
+            "route" => "admin.auditorias.index",
+            'isRoute' => request()->routeIs('admin.auditorias.index'),
+            'permiso' => 'read.users'
+        ],
     ]
 @endphp
 

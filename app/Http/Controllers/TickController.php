@@ -42,13 +42,21 @@ class TickController extends Controller
             );
         }
 
-        // La jornada de mañana termina a las 13:00.
-        // if (now()->format('H:i:s') >= '13:00:00') {
-        //     return back()->with(
-        //         'error',
-        //         'El horario de asistencia ha finalizado.'
-        //     );
-        // }
+        // La jornada termina a las 13:00: a partir de esa hora ya no se puede
+        // iniciar una nueva asistencia. La ausencia se registrará al cierre.
+        if (now()->greaterThanOrEqualTo(now()->copy()->setTime(13, 0, 0))) {
+            return back()->with(
+                'error',
+                'El horario de asistencia ha finalizado. Si no registraste asistencia, se considerará falta al cierre de la jornada.'
+            );
+        }
+
+        // Clasificación según la hora de registro (America/Lima):
+        // - antes de las 08:00  -> asistio (el tiempo cuenta desde las 08:00)
+        // - desde las 08:00     -> tardanza (hasta antes de las 13:00)
+        $tipo = now()->lessThan(now()->copy()->setTime(8, 0, 0))
+            ? EstadoAsistenciaEnum::ASISTIO
+            : EstadoAsistenciaEnum::TARDANZA;
 
         // Crear el registro solamente si todavía no existe.
         $asistencia = Asistencia::firstOrCreate(
@@ -57,7 +65,7 @@ class TickController extends Controller
                 'fecha' => today()->toDateString(),
             ],
             [
-                'tipo' => EstadoAsistenciaEnum::PENDIENTE,
+                'tipo' => $tipo,
             ]
         );
 

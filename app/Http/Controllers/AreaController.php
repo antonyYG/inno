@@ -3,12 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
-use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Yajra\DataTables\Facades\DataTables;
 
-class AreaController extends Controller
+class AreaController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:read.areas', only: ['index', 'data']),
+            new Middleware('can:create.areas', only: ['store']),
+            new Middleware('can:edit.areas', only: ['update']),
+            new Middleware('can:delete.areas', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -19,10 +30,10 @@ class AreaController extends Controller
 
     public function data()
     {
-        $query = Area::select(['id','nombre','created_at']);
+        $query = Area::select(['id', 'nombre', 'created_at']);
 
         return DataTables::eloquent($query)
-            ->addColumn('acciones',fn($area)=> view('admin.area.actions',compact('area'))->render())
+            ->addColumn('acciones', fn ($area) => view('admin.area.actions', compact('area'))->render())
             ->rawColumns(['acciones'])
             ->toJson();
     }
@@ -37,7 +48,7 @@ class AreaController extends Controller
         ]);
 
         Area::create($data);
-        session()->flash('swal',[
+        session()->flash('swal', [
             'title' => '!Ben Hecho¡',
             'message' => 'area creado correctamente',
         ]);
@@ -67,12 +78,12 @@ class AreaController extends Controller
      */
     public function update(Request $request, Area $area)
     {
-        $data=$request->validate([
-            'nombre' => 'required|unique:areas,nombre,'.$area->id
+        $data = $request->validate([
+            'nombre' => 'required|unique:areas,nombre,'.$area->id,
         ]);
 
         $area->update($data);
-        session()->flash('swal',[
+        session()->flash('swal', [
             'icon' => 'success',
             'title' => '!Ben Hecho¡',
             'message' => 'area actualizada correctamente',
@@ -88,20 +99,21 @@ class AreaController extends Controller
     public function destroy(Area $area)
     {
         if ($area->users()->exists()) {
-            session()->flash('swal',[
+            session()->flash('swal', [
                 'title' => 'No se peude elimianr!',
                 'message' => 'Usuarios asociados',
-                'icon' => 'error'
+                'icon' => 'error',
             ]);
+
             return redirect()->back();
         }
 
         $area->delete();
 
-        session()->flash('swal',[
+        session()->flash('swal', [
             'title' => 'Bien hecho!',
             'message' => 'Area eliminada correctamente',
-            'icon' => 'success'
+            'icon' => 'success',
         ]);
 
         return redirect()->back();

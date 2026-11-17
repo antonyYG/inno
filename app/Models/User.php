@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Override;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['nombre', 'apellidos', 'email', 'password', 'fecha_inicio', 'fecha_fin', 'estado', 'area_id', 'discord_id'])]
+#[Fillable(['nombre', 'apellidos', 'email', 'password', 'fecha_inicio', 'fecha_fin', 'horas_requeridas', 'estado', 'area_id', 'discord_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -33,6 +33,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'estado' => 'boolean',
+            'fecha_inicio' => 'date',
+            'fecha_fin' => 'date',
         ];
     }
 

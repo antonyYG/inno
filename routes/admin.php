@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JustificacionController;
+use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\TickController;
 use App\Http\Controllers\UserController;
@@ -21,12 +23,30 @@ Route::resource('/users', UserController::class);
 Route::get('/areas/data', [AreaController::class, 'data'])->name('areas.data');
 Route::resource('/areas', AreaController::class);
 
-// Reportes
-Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
-Route::get('/reportes/filtrar', [ReporteController::class, 'filtrar'])->name('reportes.filtrar');
-Route::get('/reportes/exportar/pdf', [ReporteController::class, 'exportarPdf'])->name('reportes.exportar.pdf');
-Route::get('/reportes/exportar/excel', [ReporteController::class, 'exportarExcel'])->name('reportes.exportar.excel');
+// Reportes (solo administradores)
+Route::middleware('role:admin')->group(function () {
+    Route::get('/reportes', [ReporteController::class, 'index'])
+        ->name('reportes.index');
 
+    Route::get('/reportes/filtrar', [ReporteController::class, 'filtrar'])
+        ->name('reportes.filtrar');
+
+    Route::get('/reportes/exportar/pdf', [ReporteController::class, 'exportarPdf'])
+        ->name('reportes.exportar.pdf');
+
+    Route::get('/reportes/exportar/excel', [ReporteController::class, 'exportarExcel'])
+        ->name('reportes.exportar.excel');
+
+    // Reporte de evidencias
+    Route::get('/reportes/filtrar-evidencias', [ReporteController::class, 'filtrarEvidencias'])
+        ->name('reportes.filtrar.evidencias');
+
+    Route::get('/reportes/exportar-evidencias/pdf', [ReporteController::class, 'exportarEvidenciasPdf'])
+        ->name('reportes.exportar.evidencias.pdf');
+
+    Route::get('/reportes/exportar-evidencias/excel', [ReporteController::class, 'exportarEvidenciasExcel'])
+        ->name('reportes.exportar.evidencias.excel');
+});
 // Calendario
 Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 Route::get('/justificaciones', [JustificacionController::class, 'index'])->name('justifications.index');
@@ -48,4 +68,19 @@ Route::post('/practicing/justificaciones/{asistencia}/store', [JustificacionCont
 Route::post('/practicing/{asistencia}/justificaciones', [JustificacionController::class, 'justificateFalta'])->name('practicing.justificaciones.store');
 
 // Certificado
-Route::get('/certificate/{user}',[UserController::class, 'getCertificate'])->name('certificate.generate');
+Route::get('/certificate/{user}', [UserController::class, 'getCertificate'])->name('certificate.generate');
+Route::get('/mi-certificado', [UserController::class, 'miCertificado'])->name('certificate.mine');
+
+// auditorias (solo administradores)
+Route::middleware('role:admin')->group(function () {
+    Route::get('/auditorias', [AuditoriaController::class, 'index'])->name('auditorias.index');
+    Route::get('/auditorias/data', [AuditoriaController::class, 'data'])->name('auditorias.data');
+});
+
+// Notificaciones
+
+Route::get('/notificaciones', [NotificacionController::class, 'data'])
+    ->name('notificaciones.data');
+
+Route::post('/notificaciones/{id}/leer', [NotificacionController::class, 'marcarLeida'])
+    ->name('notificaciones.read');

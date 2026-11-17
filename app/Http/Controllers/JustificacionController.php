@@ -2,36 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\EstadoAsistenciaEnum;
 use App\Models\Asistencia;
 use App\Models\Justificacion;
+use App\Models\User;
+use App\Notifications\SolicitudPracticaNotification;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Notification;
 
 class JustificacionController extends Controller
 {
-    public function index()
-    {
-        return view('admin.justificaciones.index');
-    }
+    // public function index()
+    // {
+    //     return view('admin.justificaciones.index');
+    // }
 
-    public function data()
-    {
-        $query = Justificacion::query()
-            ->with('asistencia.usuario')
-            ->select(['id', 'asistencia_id', 'fecha', 'tipo', 'estado']);
+    // public function data()
+    // {
+    //     $query = Justificacion::query()
+    //         ->with('asistencia.usuario')
+    //         ->select(['id', 'asistencia_id', 'fecha', 'tipo', 'estado']);
 
-        return DataTables::eloquent($query)
-            ->addColumn('usuario', fn ($justificacion) => trim(
-                ($justificacion->asistencia?->usuario?->nombre ?? '').' '.
-                ($justificacion->asistencia?->usuario?->apellidos ?? '')
-            ) ?: 'Usuario desconocido')
-            ->addColumn('acciones', fn ($justificacion) => view(
-                'admin.justificaciones.actions',
-                compact('justificacion')
-            )->render())
-            ->rawColumns(['acciones'])
-            ->toJson();
-    }
+    //     return DataTables::eloquent($query)
+    //         ->addColumn('usuario', fn ($justificacion) => trim(
+    //             ($justificacion->asistencia?->usuario?->nombre ?? '').' '.
+    //             ($justificacion->asistencia?->usuario?->apellidos ?? '')
+    //         ) ?: 'Usuario desconocido')
+    //         ->addColumn('acciones', fn ($justificacion) => view(
+    //             'admin.justificaciones.actions',
+    //             compact('justificacion')
+    //         )->render())
+    //         ->rawColumns(['acciones'])
+    //         ->toJson();
+    // }
 
     public function justificateAsistencia(Request $request, Asistencia $asistencia)
     {
@@ -60,13 +63,18 @@ class JustificacionController extends Controller
 
         $archivoPath = $request->file('archivo')->store('evidencias', 'public');
 
-        $asistencia->justificaciones()->create([
+        $justificacion = $asistencia->justificaciones()->create([
             'fecha' => now(),
             'archivo_path' => $archivoPath,
             'tipo' => 'evidencia',
             'estado' => 'pendiente',
             'descripcion' => $data['descripcion'],
         ]);
+
+        Notification::send(
+            User::role('admin')->get(),
+            new SolicitudPracticaNotification($justificacion)
+        );
 
         session()->flash('swal', [
             'icon' => 'success',
@@ -79,9 +87,20 @@ class JustificacionController extends Controller
 
     public function justificateFalta(Request $request, Asistencia $asistencia)
     {
-        // Solo el dueño de la asistencia puede justificar su falta.
+        // Solo el dueño de la asistencia puede justificarla.
         if ($asistencia->usuario_id !== auth()->id()) {
             abort(403);
+        }
+
+        // Solo se justifican faltas o tardanzas.
+        if (! in_array($asistencia->tipo, [
+            EstadoAsistenciaEnum::FALTO,
+            EstadoAsistenciaEnum::TARDANZA,
+        ], true)) {
+            return back()->with(
+                'error',
+                'Solo puedes presentar una justificación cuando tienes una falta o una tardanza.'
+            );
         }
 
         // Si la falta proviene de una evidencia rechazada, es definitiva: no admite justificación.
@@ -117,13 +136,18 @@ class JustificacionController extends Controller
 
         $archivoPath = $request->file('evidencia')->store('justificaciones', 'public');
 
-        $asistencia->justificaciones()->create([
+        $justificacion = $asistencia->justificaciones()->create([
             'fecha' => now(),
             'archivo_path' => $archivoPath,
             'tipo' => 'justificacion',
             'estado' => 'pendiente',
             'descripcion' => $data['motivo'],
         ]);
+
+        Notification::send(
+            User::role('admin')->get(),
+            new SolicitudPracticaNotification($justificacion)
+        );
 
         session()->flash('swal', [
             'icon' => 'success',

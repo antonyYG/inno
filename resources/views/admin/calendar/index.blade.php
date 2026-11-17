@@ -326,8 +326,8 @@
                             <div class="flex items-center justify-between">
 
                                 <div>
-                                    <h4 class="text-sm font-bold text-gray-900">
-                                        Justificación de inasistencia
+                                    <h4 class="text-sm font-bold text-gray-900"
+                                        x-text="selectedAttendance.tipo === 'tardanza' ? 'Justificación de tardanza' : 'Justificación de inasistencia'">
                                     </h4>
 
                                     <p class="mt-1 text-xs text-gray-500">

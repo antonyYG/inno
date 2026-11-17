@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
     @stack('css')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased">
 

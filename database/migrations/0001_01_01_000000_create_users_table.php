@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->date('fecha_inicio')->nullable();
+            $table->date('fecha_fin')->nullable();
+            $table->unsignedInteger('horas_requeridas')->default(360);
             $table->boolean('estado')->default(true);
             $table->foreignId('area_id')->nullable()->constrained('areas')->onDelete('cascade');
             $table->string('discord_id')->unique()->nullable();
@@ -46,7 +49,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('usuarios');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

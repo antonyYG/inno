@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,8 +16,37 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Helpers de pruebas
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * Crea un usuario con rol asignado.
+ */
+function crearUsuario(array $atributos = [], string $rol = 'practicante'): User
+{
+    // Estado explícito: el middleware 'active' lo consulta en la instancia en memoria.
+    $usuario = User::factory()->create(array_merge(['estado' => true], $atributos));
+    $usuario->assignRole($rol);
+
+    return $usuario;
+}
+
+/**
+ * Crea un practicante listo para registrar asistencia.
+ */
+function crearPracticante(array $atributos = []): User
+{
+    return crearUsuario(array_merge([
+        'discord_id' => '123456789012345678',
+        'estado' => true,
+    ], $atributos), 'practicante');
+}
 
 /*
 |--------------------------------------------------------------------------

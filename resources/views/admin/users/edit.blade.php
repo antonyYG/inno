@@ -114,7 +114,34 @@
                                 placeholder="Selecciona un área"
                                 search-placeholder="Buscar área..."
                             />
-                            <x-input-error for="area" />
+                            <x-input-error for="area_id" />
+                        </div>
+
+                        <div>
+                            <label for="fecha_inicio" class="mb-1 block text-sm font-medium text-slate-700">
+                                Fecha de inicio de prácticas
+                            </label>
+                            <x-input id="fecha_inicio" type="date" name="fecha_inicio"
+                                value="{{ old('fecha_inicio', $user->fecha_inicio?->format('Y-m-d')) }}" />
+                            <x-input-error for="fecha_inicio" />
+                        </div>
+
+                        <div>
+                            <label for="fecha_fin" class="mb-1 block text-sm font-medium text-slate-700">
+                                Fecha de finalización
+                            </label>
+                            <x-input id="fecha_fin" type="date" name="fecha_fin"
+                                value="{{ old('fecha_fin', $user->fecha_fin?->format('Y-m-d')) }}" />
+                            <x-input-error for="fecha_fin" />
+                        </div>
+
+                        <div>
+                            <label for="horas_requeridas" class="mb-1 block text-sm font-medium text-slate-700">
+                                Horas requeridas
+                            </label>
+                            <x-input id="horas_requeridas" type="number" name="horas_requeridas"
+                                value="{{ old('horas_requeridas', $user->horas_requeridas ?: 360) }}" min="1" step="1" />
+                            <x-input-error for="horas_requeridas" />
                         </div>
                     </div>
                 </fieldset>

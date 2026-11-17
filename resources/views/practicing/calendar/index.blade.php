@@ -446,17 +446,19 @@
 
                         </template>
 
-                        <!-- Justificación de falta -->
-                        <template x-if="selectedAttendance.tipo === 'falto' && !evidenciaRechazada()">
+                        <!-- Justificación de falta o tardanza -->
+                        <template x-if="['falto', 'tardanza'].includes(selectedAttendance.tipo) && !evidenciaRechazada()">
 
                             <section class="pt-8 border-t border-gray-100">
 
-                                <h4 class="text-sm font-semibold text-gray-900 mb-1">
-                                    Justificación de inasistencia
+                                <h4 class="text-sm font-semibold text-gray-900 mb-1"
+                                    x-text="selectedAttendance.tipo === 'tardanza' ? 'Justificación de tardanza' : 'Justificación de inasistencia'">
                                 </h4>
 
-                                <p class="text-sm text-gray-500 mb-4">
-                                    Presenta el motivo de tu inasistencia y adjunta un documento de respaldo.
+                                <p class="text-sm text-gray-500 mb-4"
+                                    x-text="selectedAttendance.tipo === 'tardanza'
+                                        ? 'Explica el motivo de tu tardanza y adjunta un documento de respaldo. Si se aprueba, la tardanza se mantiene registrada.'
+                                        : 'Presenta el motivo de tu inasistencia y adjunta un documento de respaldo.'">
                                 </p>
 
                                 <!-- Ya enviada -->
@@ -558,7 +560,9 @@
                                                 name="motivo"
                                                 rows="4"
                                                 required
-                                                placeholder="Describe el motivo de tu inasistencia..."
+                                                :placeholder="selectedAttendance.tipo === 'tardanza'
+                                                    ? 'Describe el motivo de tu tardanza...'
+                                                    : 'Describe el motivo de tu inasistencia...'"
                                                 class="w-full rounded-xl border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-gray-500 text-sm"></textarea>
                                         </div>
 
@@ -608,6 +612,57 @@
                                     </form>
 
                                 </template>
+
+                            </section>
+
+                        </template>
+
+                        <!-- Tardanza con justificación aprobada: el estado de tardanza se conserva -->
+                        <template x-if="selectedAttendance.tipo === 'tardanza' && selectedAttendance.justificacion && selectedAttendance.justificacion.estado === 'aprobada'">
+
+                            <section class="pt-8 border-t border-gray-100">
+
+                                <h4 class="text-sm font-semibold text-gray-900 mb-1">
+                                    Tardanza justificada
+                                </h4>
+
+                                <div class="rounded-2xl border border-green-200 bg-green-50 overflow-hidden">
+
+                                    <div class="flex items-start gap-3 px-4 py-3">
+                                        <i class="fa-solid fa-circle-check text-green-600 mt-0.5"></i>
+                                        <div class="text-sm text-green-800">
+                                            <p>Tu tardanza fue justificada. La hora de ingreso se mantiene registrada.</p>
+                                            <p
+                                                class="mt-1 whitespace-pre-line"
+                                                x-show="selectedAttendance.justificacion.observacion"
+                                                x-text="'Observación del administrador: ' + selectedAttendance.justificacion.observacion"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-4 py-3 border-t border-green-200 bg-white">
+                                        <p class="text-xs font-medium text-gray-500">Motivo presentado</p>
+
+                                        <p
+                                            class="text-sm text-gray-900 mt-1 leading-relaxed whitespace-pre-line"
+                                            x-text="selectedAttendance.justificacion.descripcion || selectedAttendance.justificacion.motivo">
+                                        </p>
+                                    </div>
+
+                                    <a
+                                        :href="selectedAttendance.justificacion.url"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="flex items-center justify-between gap-3 px-4 py-3 border-t border-green-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-400 transition">
+
+                                        <span class="flex items-center gap-2">
+                                            <i class="fa-regular fa-file-lines"></i>
+                                            Ver documento enviado
+                                        </span>
+
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-400"></i>
+                                    </a>
+
+                                </div>
 
                             </section>
 

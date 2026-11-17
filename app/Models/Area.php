@@ -6,7 +6,6 @@ use App\Models\Scopes\FiltersScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ScopedBy(FiltersScope::class)]
 
@@ -18,18 +17,17 @@ class Area extends Model
 
     protected $fillable = ['nombre'];
 
-    public function scopeGetOrPaginate($query,int $default=5)
+    public function scopeGetOrPaginate($query, int $default = 5)
     {
-        $perPage = request('perPage',$default);
+        $perPage = request('perPage', $default);
+
         return $query->paginate($perPage);
     }
 
-    public array $allowedFilters=['nombre'];
+    public array $allowedFilters = ['nombre'];
 
     public function users()
     {
-        return $this->HasMany(User::class);
+        return $this->HasMany(User::class, 'area_id');
     }
-
-
 }
