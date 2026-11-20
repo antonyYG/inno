@@ -146,7 +146,11 @@ class AsistenciaCierreCommand extends Command
         if ($creadas !== []) {
             Notification::send(
                 User::role('admin')->get(),
-                new FaltaAutomaticaNotification($creadas, $fecha->translatedFormat('d/m/Y'))
+                new FaltaAutomaticaNotification(
+                    $creadas,
+                    $fecha->translatedFormat('d/m/Y'),
+                    $fecha->toDateString()
+                )
             );
         }
 

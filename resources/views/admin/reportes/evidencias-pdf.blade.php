@@ -1,18 +1,26 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Reporte de evidencias</title>
+
     <style>
         body {
-            font-family: sans-serif;
+            font-family: DejaVu Sans, sans-serif;
             font-size: 11px;
+            color: #334155;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 20px;
+            color: #020830;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
         }
 
         table {
@@ -20,29 +28,45 @@
             border-collapse: collapse;
         }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 7px;
+        th {
+            background-color: #020830;
+            color: white;
+            padding: 10px;
             text-align: left;
         }
 
-        th {
-            background: #eeeeee;
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 9px;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .total {
+            margin-top: 15px;
+            text-align: right;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h2>Reporte de evidencias</h2>
 
-    <p>Fecha de generación: {{ now()->format('d/m/Y H:i') }}</p>
-    <p>Total de evidencias: {{ $evidencias->count() }}</p>
+    <h2>REPORTE DE EVIDENCIAS</h2>
+
+    <p class="subtitle">
+        PractiControl - Fecha de generación: {{ now()->format('d/m/Y H:i') }}
+    </p>
 
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Practicante</th>
-                <th>Fecha</th>
+                <th>Área</th>
+                <th>Fecha de presentación</th>
                 <th>Descripción</th>
                 <th>Estado</th>
                 <th>Observación</th>
@@ -50,25 +74,29 @@
         </thead>
 
         <tbody>
-            @forelse ($evidencias as $evidencia)
+            @forelse($registros as $registro)
                 <tr>
-                    <td>{{ $evidencia->id }}</td>
-                    <td>
-                        {{ $evidencia->asistencia?->usuario
-                            ? $evidencia->asistencia->usuario->nombre . ' ' . $evidencia->asistencia->usuario->apellidos
-                            : 'Sin practicante' }}
-                    </td>
-                    <td>{{ $evidencia->fecha }}</td>
-                    <td>{{ $evidencia->descripcion }}</td>
-                    <td>{{ ucfirst($evidencia->estado) }}</td>
-                    <td>{{ $evidencia->observacion ?? '-' }}</td>
+                    <td>{{ $registro->id }}</td>
+                    <td>{{ $registro->practicante }}</td>
+                    <td>{{ $registro->area }}</td>
+                    <td>{{ $registro->fecha }}</td>
+                    <td>{{ $registro->descripcion }}</td>
+                    <td>{{ ucfirst($registro->estado) }}</td>
+                    <td>{{ $registro->observacion }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">No hay evidencias para mostrar.</td>
+                    <td colspan="7" style="text-align: center;">
+                        No se encontraron registros.
+                    </td>
                 </tr>
             @endforelse
         </tbody>
     </table>
+
+    <p class="total">
+        Total de registros: {{ $registros->count() }}
+    </p>
+
 </body>
 </html>

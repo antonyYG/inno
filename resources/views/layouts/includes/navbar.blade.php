@@ -27,34 +27,64 @@
             </div>
             <div class="flex items-center">
                 @if (auth()->user()->hasRole('admin'))
-                <div id="admin-notificaciones" class="relative mr-4" data-url="{{ route('admin.notificaciones.data') }}"
+                <div id="admin-notificaciones" class="relative mr-2 sm:mr-4" data-url="{{ route('admin.notificaciones.data') }}"
                     data-read-url="{{ route('admin.notificaciones.read', ':id') }}">
                     <button type="button" id="btn-notificaciones"
-                        class="relative p-2 text-white hover:bg-white/10 rounded-lg" aria-label="Notificaciones">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="relative rounded-lg p-2 text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#f2c94c]/60"
+                        aria-label="Notificaciones" aria-haspopup="dialog" aria-expanded="false"
+                        aria-controls="panel-notificaciones">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 00-4 0v.3A6 6 0 006 11v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 01-6 0m6 0H9" />
                         </svg>
 
                         <span id="contador-notificaciones"
-                            class="hidden absolute -top-1 -right-1 min-w-5 h-5 px-1
-                   items-center justify-center rounded-full bg-red-500
-                   text-white text-xs font-bold">0</span>
+                            class="absolute -right-1 -top-1 hidden h-5 min-w-5 items-center justify-center rounded-full bg-[#f2c94c] px-1 text-xs font-bold text-[#020830] ring-2 ring-[#020830]">0</span>
                     </button>
 
-                    <div id="panel-notificaciones"
-                        class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white
-               rounded-xl shadow-xl border border-gray-200 z-50">
-                        <div class="flex justify-between items-center p-4 border-b">
-                            <h3 class="font-semibold text-gray-800">
-                                Notificaciones
-                            </h3>
-                            <span class="text-xs text-gray-500">Solicitudes recibidas</span>
+                    <div id="panel-notificaciones" role="dialog" aria-label="Notificaciones"
+                        class="absolute right-0 z-50 mt-3 hidden w-[calc(100vw-1.5rem)] max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:w-96">
+                        <div class="border-b border-slate-100 px-4 pb-3 pt-4">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900">Notificaciones</h3>
+                                    <p class="mt-0.5 text-xs text-slate-500">Solicitudes y novedades recientes</p>
+                                </div>
+
+                                <span class="rounded-full bg-[#f2c94c]/15 px-2.5 py-1 text-[11px] font-semibold text-[#8a6a00]">
+                                    PractiControl
+                                </span>
+                            </div>
+
+                            <div class="mt-3 flex gap-1 rounded-xl bg-slate-100 p-1" role="tablist"
+                                aria-label="Estado de notificaciones">
+                                <button type="button" data-tab="pendientes" role="tab" aria-selected="true"
+                                    class="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-[#020830] shadow-sm transition">
+                                    Pendientes
+                                    <span id="contador-pendientes"
+                                        class="rounded-full bg-[#f2c94c] px-1.5 py-0.5 text-[10px] font-bold text-[#020830]">0</span>
+                                </button>
+
+                                <button type="button" data-tab="historial" role="tab" aria-selected="false"
+                                    class="flex flex-1 items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:text-slate-800">
+                                    Historial
+                                </button>
+                            </div>
                         </div>
 
-                        <div id="lista-notificaciones" class="max-h-96 overflow-y-auto">
-                            <p class="p-5 text-center text-sm text-gray-500">
+                        <div id="lista-notificaciones" data-estado="pendientes" role="tabpanel"
+                            class="max-h-[min(60vh,22rem)] overflow-y-auto overscroll-contain">
+                            <div class="px-5 py-8 text-center text-sm text-slate-500">
                                 Cargando notificaciones...
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2 border-t border-slate-100 bg-slate-50/70 px-4 py-2">
+                            <p class="text-[11px] text-slate-500">
+                                Al abrir una notificación se marca como leída.
+                            </p>
+                            <p class="shrink-0 text-[11px] font-medium text-slate-400">
+                                Se conserva en el historial
                             </p>
                         </div>
                     </div>

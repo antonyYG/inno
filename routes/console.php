@@ -17,3 +17,11 @@ Schedule::command('asistencia:cierre')
     ->at('13:05')
     ->timezone('America/Lima')
     ->withoutOverlapping();
+
+// Validación automática de ingresos a Discord a las 09:00 (America/Lima):
+// convierte en falta los pendientes sin hora_inicio y crea las faltas de
+// quienes no tienen registro. El comando es idempotente.
+Schedule::command('asistencia:validar-ingresos')
+    ->dailyAt('09:00')
+    ->timezone('America/Lima')
+    ->withoutOverlapping();

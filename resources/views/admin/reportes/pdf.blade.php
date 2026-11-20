@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -57,7 +56,7 @@
     <h2>REPORTE DE ASISTENCIAS</h2>
 
     <p class="subtitle">
-        PractiControl - CRUD AGENCY
+        PractiControl - Fecha de generación: {{ now()->format('d/m/Y H:i') }}
     </p>
 
     <table>
@@ -65,6 +64,7 @@
             <tr>
                 <th>N°</th>
                 <th>Practicante</th>
+                <th>Área</th>
                 <th>Fecha</th>
                 <th>Hora de ingreso</th>
                 <th>Hora de salida</th>
@@ -74,31 +74,29 @@
         </thead>
 
         <tbody>
-    @forelse($asistencias as $asistencia)
-        <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>
-                {{ $asistencia->usuario->nombre }}
-                {{ $asistencia->usuario->apellidos }}
-            </td>
-            <td>{{ $asistencia->fecha }}</td>
-            <td>{{ $asistencia->hora_inicio ?? '-' }}</td>
-            <td>{{ $asistencia->hora_fin ?? '-' }}</td>
-            <td>{{ $asistencia->tiempo_trabajado ?? '-' }}</td>
-            <td>{{ $asistencia->tipo }}</td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="7" style="text-align: center;">
-                No se encontraron registros.
-            </td>
-        </tr>
-    @endforelse
-</tbody>
+            @forelse($registros as $registro)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $registro->practicante }}</td>
+                    <td>{{ $registro->area }}</td>
+                    <td>{{ $registro->fecha }}</td>
+                    <td>{{ $registro->hora_inicio }}</td>
+                    <td>{{ $registro->hora_fin }}</td>
+                    <td>{{ $registro->tiempo_trabajado }}</td>
+                    <td>{{ ucfirst($registro->estado) }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" style="text-align: center;">
+                        No se encontraron registros.
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
     </table>
 
     <p class="total">
-        Total de registros: {{ $asistencias->count() }}
+        Total de registros: {{ $registros->count() }}
     </p>
 
 </body>

@@ -11,18 +11,19 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 class AttendanceExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     public function __construct(
-        private Collection $asistencias
+        private Collection $registros
     ) {}
 
     public function collection(): Collection
     {
-        return $this->asistencias;
+        return $this->registros;
     }
 
     public function headings(): array
     {
         return [
             'Practicante',
+            'Área',
             'Fecha',
             'Hora de ingreso',
             'Hora de salida',
@@ -31,23 +32,16 @@ class AttendanceExport implements FromCollection, ShouldAutoSize, WithHeadings, 
         ];
     }
 
-    public function map($asistencia): array
+    public function map($registro): array
     {
         return [
-            trim(($asistencia->usuario->nombre ?? '').' '.($asistencia->usuario->apellidos ?? '')),
-            $asistencia->fecha,
-            $asistencia->hora_inicio instanceof \DateTimeInterface
-                ? $asistencia->hora_inicio->format('H:i:s')
-                : $asistencia->hora_inicio,
-            $asistencia->hora_fin instanceof \DateTimeInterface
-                ? $asistencia->hora_fin->format('H:i:s')
-                : $asistencia->hora_fin,
-            $asistencia->tiempo_trabajado instanceof \DateInterval
-                ? $asistencia->tiempo_trabajado->format('%H:%I:%S')
-                : $asistencia->tiempo_trabajado,
-            $asistencia->tipo instanceof \BackedEnum
-                ? $asistencia->tipo->value
-                : $asistencia->tipo,
+            $registro->practicante,
+            $registro->area,
+            $registro->fecha,
+            $registro->hora_inicio,
+            $registro->hora_fin,
+            $registro->tiempo_trabajado,
+            ucfirst($registro->estado),
         ];
     }
 }

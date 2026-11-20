@@ -4,18 +4,19 @@ namespace App\Exports;
 
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class EvidenceExport implements FromCollection, WithHeadings, WithMapping
+class EvidenceExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     public function __construct(
-        protected Collection $evidencias
+        protected Collection $registros
     ) {}
 
     public function collection(): Collection
     {
-        return $this->evidencias;
+        return $this->registros;
     }
 
     public function headings(): array
@@ -23,26 +24,24 @@ class EvidenceExport implements FromCollection, WithHeadings, WithMapping
         return [
             'ID',
             'Practicante',
-            'Fecha',
+            'Área',
+            'Fecha de presentación',
             'Descripción',
             'Estado',
             'Observación',
         ];
     }
 
-    public function map($evidencia): array
+    public function map($registro): array
     {
-        $usuario = $evidencia->asistencia?->usuario;
-
         return [
-            $evidencia->id,
-            $usuario
-                ? $usuario->nombre.' '.$usuario->apellidos
-                : 'Sin practicante',
-            $evidencia->fecha,
-            $evidencia->descripcion,
-            $evidencia->estado,
-            $evidencia->observacion,
+            $registro->id,
+            $registro->practicante,
+            $registro->area,
+            $registro->fecha,
+            $registro->descripcion,
+            ucfirst($registro->estado),
+            $registro->observacion,
         ];
     }
 }

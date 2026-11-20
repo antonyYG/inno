@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Enum\EstadoAsistenciaEnum;
 use App\Models\Asistencia;
+use App\Services\AuditoriaJustificacionService;
 use App\Services\AuditoriaService;
 use App\Services\CalendarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class CalendarController extends Controller
 {
     public function __construct(
         protected CalendarService $calendarService,
-        protected AuditoriaService $auditoriaService
+        protected AuditoriaService $auditoriaService,
+        protected AuditoriaJustificacionService $auditoriaJustificacionService
     ) {}
 
     public function index()
@@ -153,40 +156,12 @@ class CalendarController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
-
-            $tipoAnterior = $this->obtenerEstado($asistencia->tipo);
-
-            // Una justificación de tardanza aprobada NO cambia el estado de
-            // asistencia: se conserva la trazabilidad de que llegó tarde.
-            // Solo la justificación de una falta aplica 'justificado'.
             $esTardanza = $asistencia->tipo === EstadoAsistenciaEnum::TARDANZA;
-            $tipoNuevo = $esTardanza ? EstadoAsistenciaEnum::TARDANZA : EstadoAsistenciaEnum::JUSTIFICADO;
 
-            // Actualizar asistencia
-            $asistencia->tipo = $tipoNuevo;
-            $asistencia->save();
-
-            // Actualizar justificación sin generar otra auditoría
-            $this->actualizarJustificaciones(
+            $this->auditoriaJustificacionService->registrarAceptacion(
                 $asistencia,
-                'justificacion',
-                'aprobada',
                 $data['observacion'] ?? null
             );
-
-            // Registrar una sola auditoría
-            $this->auditoriaService->registrar(
-                $asistencia,
-                'justificacion_aprobada',
-                $esTardanza
-                    ? 'El administrador aprobó la justificación de la tardanza. La tardanza se mantiene registrada.'
-                    : 'El administrador aprobó la justificación de la falta.',
-                ['tipo' => $tipoAnterior],
-                ['tipo' => $tipoNuevo->value]
-            );
-
-            DB::commit();
 
             return response()->json([
                 'message' => $esTardanza
@@ -195,8 +170,6 @@ class CalendarController extends Controller
             ]);
 
         } catch (Throwable $e) {
-            DB::rollBack();
-
             report($e);
 
             return response()->json([
@@ -215,39 +188,12 @@ class CalendarController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
-
-            $tipoAnterior = $this->obtenerEstado($asistencia->tipo);
-
-            // Rechazar la justificación mantiene el estado anterior:
-            // una falta sigue siendo falta y una tardanza sigue siendo tardanza.
             $esTardanza = $asistencia->tipo === EstadoAsistenciaEnum::TARDANZA;
-            $tipoNuevo = $esTardanza ? EstadoAsistenciaEnum::TARDANZA : EstadoAsistenciaEnum::FALTO;
 
-            // Actualizar asistencia
-            $asistencia->tipo = $tipoNuevo;
-            $asistencia->save();
-
-            // Actualizar justificación sin generar otra auditoría
-            $this->actualizarJustificaciones(
+            $this->auditoriaJustificacionService->registrarRechazo(
                 $asistencia,
-                'justificacion',
-                'rechazada',
                 $data['observacion'] ?? null
             );
-
-            // Registrar una sola auditoría
-            $this->auditoriaService->registrar(
-                $asistencia,
-                'justificacion_rechazada',
-                $esTardanza
-                    ? 'El administrador rechazó la justificación de la tardanza. La tardanza se mantiene registrada.'
-                    : 'El administrador rechazó la justificación. La asistencia quedó como falta.',
-                ['tipo' => $tipoAnterior],
-                ['tipo' => $tipoNuevo->value]
-            );
-
-            DB::commit();
 
             return response()->json([
                 'message' => $esTardanza
@@ -256,8 +202,6 @@ class CalendarController extends Controller
             ]);
 
         } catch (Throwable $e) {
-            DB::rollBack();
-
             report($e);
 
             return response()->json([
@@ -267,8 +211,8 @@ class CalendarController extends Controller
     }
 
     /**
-     * Actualizar evidencias o justificaciones pendientes.
-     * No genera registros de auditoría.
+     * Actualizar evidencias pendientes.
+     * La auditoría de evidencias se mantiene en su flujo original.
      */
     private function actualizarJustificaciones(
         Asistencia $asistencia,

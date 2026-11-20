@@ -249,7 +249,18 @@
                                         x-for="evidencia in selectedAttendance.evidencias"
                                         :key="evidencia.id">
 
-                                        <div class="rounded-xl border border-gray-200 p-3 transition hover:border-gray-300">
+                                        <div
+                                            class="rounded-xl border border-gray-200 p-3 transition hover:border-gray-300"
+                                            :class="registroDestacado === String(evidencia.id)
+                                                ? 'ring-2 ring-[#f2c94c] border-[#f2c94c] bg-[#f2c94c]/5'
+                                                : ''">
+
+                                            <span
+                                                x-show="registroDestacado === String(evidencia.id)"
+                                                class="mb-2 inline-flex items-center gap-1 rounded-full bg-[#f2c94c]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#8a6a00]">
+                                                <i class="fa-solid fa-bell"></i>
+                                                Registro de la notificación
+                                            </span>
 
                                             <div class="flex items-center gap-3">
 
@@ -351,9 +362,20 @@
                                         x-for="just in selectedAttendance.justificaciones"
                                         :key="just.id">
 
-                                        <div class="overflow-hidden rounded-xl border border-gray-200">
+                                        <div
+                                            class="overflow-hidden rounded-xl border border-gray-200 transition"
+                                            :class="registroDestacado === String(just.id)
+                                                ? 'ring-2 ring-[#f2c94c] border-[#f2c94c] bg-[#f2c94c]/5'
+                                                : ''">
 
                                             <div class="p-4">
+
+                                                <span
+                                                    x-show="registroDestacado === String(just.id)"
+                                                    class="mb-2 inline-flex items-center gap-1 rounded-full bg-[#f2c94c]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#8a6a00]">
+                                                    <i class="fa-solid fa-bell"></i>
+                                                    Registro de la notificación
+                                                </span>
 
                                                 <div class="flex items-start justify-between gap-3">
 
@@ -704,6 +726,10 @@
                     selectedAttendance: null,
                     calendar: null,
 
+                    destinoNotificacion: null,
+                    registroDestacado: null,
+                    deepLinkProcesado: false,
+
                     rejectionOpen: false,
                     rejectionType: null,
                     rejectionReason: '',
@@ -718,6 +744,18 @@
                     reviewed: {},
 
                     init() {
+
+                        const parametros = new URLSearchParams(window.location.search);
+                        const fechaSolicitada = parametros.get('fecha');
+
+                        this.destinoNotificacion = {
+                            asistenciaId: parametros.get('asistencia'),
+                            registroId: parametros.get('registro'),
+                        };
+
+                        const fechaInicial = /^\d{4}-\d{2}-\d{2}$/.test(fechaSolicitada || '')
+                            ? fechaSolicitada
+                            : undefined;
 
                         this.$nextTick(() => {
 
@@ -745,6 +783,8 @@
 
                                     initialView: 'dayGridMonth',
 
+                                    initialDate: fechaInicial,
+
                                     slotMinTime: '07:00:00',
                                     slotMaxTime: '13:00:00',
 
@@ -765,6 +805,10 @@
                                             console.error('Error cargando eventos:', error);
                                             alert('Error al cargar las asistencias.');
                                         }
+                                    },
+
+                                    eventsSet: (events) => {
+                                        this.abrirDesdeNotificacion(events);
                                     },
 
                                     eventContent: (info) => {
@@ -811,11 +855,7 @@
 
                                         info.jsEvent.preventDefault();
 
-                                        this.selectedAttendance = this.buildAttendance(info.event);
-
-                                        this.resetForms();
-
-                                        this.drawerOpen = true;
+                                        this.abrirDetalle(info.event);
                                     }
 
                                 }
@@ -824,6 +864,53 @@
                             this.calendar.render();
 
                         });
+                    },
+
+                    /**
+                     * Abre directamente el registro indicado por una notificación.
+                     * Solo usa el id real del evento devuelto por CalendarService.
+                     */
+                    abrirDesdeNotificacion(events) {
+
+                        if (this.deepLinkProcesado || !this.destinoNotificacion?.asistenciaId) {
+                            return;
+                        }
+
+                        const evento = events.find(
+                            (event) => String(event.id) === String(this.destinoNotificacion.asistenciaId)
+                        );
+
+                        if (!evento) {
+                            return;
+                        }
+
+                        this.deepLinkProcesado = true;
+                        this.calendar?.gotoDate(evento.start);
+                        this.abrirDetalle(evento);
+                    },
+
+                    abrirDetalle(event) {
+
+                        this.selectedAttendance = this.buildAttendance(event);
+                        this.registroDestacado = this.registroDeNotificacion();
+                        this.resetForms();
+                        this.drawerOpen = true;
+                    },
+
+                    registroDeNotificacion() {
+
+                        const registroId = this.destinoNotificacion?.registroId;
+
+                        if (!registroId || !this.selectedAttendance) {
+                            return null;
+                        }
+
+                        const ids = [
+                            ...this.selectedAttendance.evidencias.map((evidencia) => String(evidencia.id)),
+                            ...this.selectedAttendance.justificaciones.map((justificacion) => String(justificacion.id)),
+                        ];
+
+                        return ids.includes(String(registroId)) ? String(registroId) : null;
                     },
 
                     /**

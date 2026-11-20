@@ -62,6 +62,8 @@ class SolicitudPracticaNotification extends Notification
 
             'asistencia_id' => $justificacion->asistencia_id,
 
+            'asistencia_fecha' => $justificacion->asistencia?->fecha,
+
             'practicante' => $usuario->nombre.' '.$usuario->apellidos,
 
             'estado' => $justificacion->estado,

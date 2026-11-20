@@ -2,55 +2,49 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleSeeder extends Seeder
 {
+    /**
+     * Permisos asignados a cada rol demo.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function permisosPorRol(): array
+    {
+        return [
+            'admin' => array_values(array_diff(
+                PermissionSeeder::permisos(),
+                ['mark.attendance']
+            )),
+            'practicante' => [
+                'read.calendar',
+                'mark.attendance',
+                'read.justificate',
+                'read.dashboard',
+            ],
+        ];
+    }
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $admin= Role::create([
-            'name' => 'admin'
-        ]);
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $admin->syncPermissions([
-            'create.users',
-            'edit.users',
-            'delete.users',
-            'read.users',
-            'read.calendar',
-            'create.areas',
-            'edit.areas',
-            'delete.areas',
-            'read.areas',
-            'read.justificate',
-            'explain.absence',
-            'read.dashboard'
-        ]);
+        foreach (self::permisosPorRol() as $nombre => $permisos) {
+            $role = Role::firstOrCreate([
+                'name' => $nombre,
+                'guard_name' => 'web',
+            ]);
 
-        $user = User::find(1);
-        $user->assignRole('admin');
+            $role->syncPermissions($permisos);
+        }
 
-        $practicing = Role::create([
-            'name' => 'practicante'
-        ]);
-
-        $practicing->syncPermissions([
-            'read.calendar',
-            'mark.attendance',
-            'read.justificate',
-            'read.calendar',
-            'read.dashboard'
-        ]);
-
-
-
-
-
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }
